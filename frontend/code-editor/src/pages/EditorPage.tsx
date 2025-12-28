@@ -12,8 +12,6 @@ import {
   MessageSquare,
   Terminal as TerminalIcon,
   X,
-  ChevronDown,
-  ChevronUp,
   Maximize2,
   Minimize2,
 } from "lucide-react";
@@ -51,16 +49,16 @@ export default function EditorPage() {
 
       setTerminalOutput(
         result.stdout ||
-          result.stderr ||
-          result.compile_output ||
-          result.status ||
-          "No output"
+        result.stderr ||
+        result.compile_output ||
+        result.status ||
+        "No output"
       );
     } catch (err: any) {
       setTerminalOutput(
         err?.response?.data?.error ||
-          err?.message ||
-          JSON.stringify(err, null, 2)
+        err?.message ||
+        JSON.stringify(err, null, 2)
       );
     } finally {
       setIsRunning(false);
@@ -103,7 +101,7 @@ export default function EditorPage() {
               <button
                 onClick={handleRun}
                 disabled={isRunning || !activeFile}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium bg-emerald-600 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium bg-emerald-800 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
               >
                 <Play size={14} />
                 {isRunning ? "Running..." : "Run"}
@@ -111,11 +109,10 @@ export default function EditorPage() {
 
               <button
                 onClick={() => setShowTerminal(!showTerminal)}
-                className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                  showTerminal
-                    ? "bg-[#1a1a24] text-violet-400 border border-violet-500/30"
-                    : "text-slate-400 hover:bg-[#1a1a24] hover:text-slate-300"
-                }`}
+                className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${showTerminal
+                  ? "bg-[#1a1a24] text-violet-400 border border-violet-500/30"
+                  : "text-slate-400 hover:bg-[#1a1a24] hover:text-slate-300"
+                  }`}
               >
                 <TerminalIcon size={14} />
                 Terminal
@@ -123,11 +120,10 @@ export default function EditorPage() {
 
               <button
                 onClick={() => setShowChat(!showChat)}
-                className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${
-                  showChat
-                    ? "bg-[#1a1a24] text-violet-400 border border-violet-500/30"
-                    : "text-slate-400 hover:bg-[#1a1a24] hover:text-slate-300"
-                }`}
+                className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${showChat
+                  ? "bg-[#1a1a24] text-violet-400 border border-violet-500/30"
+                  : "text-slate-400 hover:bg-[#1a1a24] hover:text-slate-300"
+                  }`}
               >
                 <MessageSquare size={14} />
                 Chat
@@ -135,7 +131,7 @@ export default function EditorPage() {
             </div>
           </div>
 
-          <div className="flex-1 overflow-hidden relative bg-[#0d0d14]">
+          <div className="flex-1 overflow-hidden relative bg-[#1e1e1e]">
             {activeFile ? (
               <Editor key={activeFile._id} fileName={activeFile.name} />
             ) : (
@@ -157,10 +153,10 @@ export default function EditorPage() {
 
           {showTerminal && (
             <div
-              className="border-t border-[#1e1e2e] bg-[#0a0a0f] flex flex-col"
+              className="border-t border-[#2a2a2a] bg-[#0d0d0d] flex flex-col"
               style={{ height: terminalHeight }}
             >
-              <div className="flex items-center justify-between px-3 py-1.5 bg-[#0d0d14] border-b border-[#1e1e2e]">
+              <div className="flex items-center justify-between px-3 py-1.5 bg-[#141414] border-b border-[#2a2a2a]">
                 <div className="flex items-center gap-4">
                   <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">
                     Terminal
@@ -190,7 +186,6 @@ export default function EditorPage() {
                 isRunning={isRunning}
                 input={stdin}
                 onInputChange={setStdin}
-                onClose={() => setShowTerminal(false)}
               />
             </div>
           )}

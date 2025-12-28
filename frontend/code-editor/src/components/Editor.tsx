@@ -22,6 +22,7 @@ export default function Editor({ fileName }: EditorProps) {
   const [ready, setReady] = useState(false);
 
   const hydratedRef = useRef(false);
+  const decorationsRef = useRef<string[]>([]);
 
   const [, updateMyPresence] = useMyPresence();
   const others = useOthers();
@@ -145,6 +146,8 @@ export default function Editor({ fileName }: EditorProps) {
         const cursor = other.presence?.cursor;
         if (!cursor) return null;
 
+        const userName = other.info?.name || "User";
+
         return {
           range: new monaco.Range(
             cursor.lineNumber,
@@ -155,7 +158,7 @@ export default function Editor({ fileName }: EditorProps) {
           options: {
             className: "remote-cursor",
             after: {
-              content: other.info?.name ?? "User",
+              content: userName,
               inlineClassName: "remote-cursor-name",
             },
           },
@@ -163,7 +166,11 @@ export default function Editor({ fileName }: EditorProps) {
       })
       .filter(Boolean) as editor.IModelDeltaDecoration[];
 
-    editorRef.deltaDecorations([], decorations);
+    // Clear old decorations and apply new ones
+    decorationsRef.current = editorRef.deltaDecorations(
+      decorationsRef.current,
+      decorations
+    );
   }, [others, editorRef]);
 
   const handleMount = useCallback(

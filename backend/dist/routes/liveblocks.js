@@ -2,6 +2,7 @@ import { Router } from "express";
 import jwt from "jsonwebtoken";
 import { Liveblocks } from "@liveblocks/node";
 import dotenv from "dotenv";
+import { User } from "../models/usermodels.js";
 dotenv.config();
 const router = Router();
 const liveblocks = new Liveblocks({
@@ -28,9 +29,12 @@ router.post("/auth", async (req, res) => {
         if (!isAuthJwtPayload(decoded)) {
             return res.status(403).json({ error: "Invalid token payload" });
         }
+        // Fetch actual user name from database
+        const user = await User.findById(decoded.userId).select("name").lean();
+        const userName = user?.name || "Anonymous";
         const session = liveblocks.prepareSession(decoded.userId, {
             userInfo: {
-                name: decoded.userId,
+                name: userName,
             },
         });
         session.allow("*", session.FULL_ACCESS);

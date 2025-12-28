@@ -3,6 +3,7 @@ import type { JwtPayload } from "jsonwebtoken";
 import jwt from "jsonwebtoken";
 import { Liveblocks } from "@liveblocks/node";
 import dotenv from "dotenv";
+import { User } from "../models/usermodels.js";
 
 dotenv.config();
 
@@ -49,9 +50,13 @@ router.post("/auth", async (req, res) => {
       return res.status(403).json({ error: "Invalid token payload" });
     }
 
+    // Fetch actual user name from database
+    const user = await User.findById(decoded.userId).select("name").lean();
+    const userName = user?.name || "Anonymous";
+
     const session = liveblocks.prepareSession(decoded.userId, {
       userInfo: {
-        name: decoded.userId,
+        name: userName,
       },
     });
 

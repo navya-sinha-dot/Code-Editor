@@ -14,7 +14,6 @@ export default function Navbar() {
     navigate("/");
   };
 
-  // Minimal navbar for editor page
   if (isEditorPage) {
     return (
       <nav className="flex items-center justify-between px-4 py-2 border-b border-[#1e1e2e] bg-[#0d0d14] text-slate-100 h-12">
@@ -84,7 +83,7 @@ export default function Navbar() {
             </Link>
             <Link
               to="/signup"
-              className="px-5 py-2.5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white font-medium rounded-lg transition-all shadow-lg shadow-violet-500/20"
+              className="px-5 py-2.5 bg-[#4C1170] hover:from-violet-500 hover:to-indigo-500 text-white font-medium rounded-lg transition-all shadow-lg shadow-violet-500/20"
             >
               Get Started
             </Link>

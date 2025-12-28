@@ -4,7 +4,6 @@ import { Terminal as TerminalIcon, Keyboard } from "lucide-react";
 interface TerminalProps {
   output: string;
   isRunning: boolean;
-  onClose: () => void;
   input: string;
   onInputChange: (val: string) => void;
 }
@@ -12,7 +11,6 @@ interface TerminalProps {
 export default function Terminal({
   output,
   isRunning,
-  onClose,
   input,
   onInputChange,
 }: TerminalProps) {
@@ -20,25 +18,23 @@ export default function Terminal({
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      <div className="flex items-center gap-1 px-2 py-1 bg-[#0a0a0f] border-b border-[#1e1e2e]">
+      <div className="flex items-center gap-1 px-2 py-1 bg-[#0d0d0d] border-b border-[#2a2a2a]">
         <button
           onClick={() => setActiveTab("output")}
-          className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-            activeTab === "output"
-              ? "bg-[#1a1a24] text-emerald-400"
-              : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
-          }`}
+          className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${activeTab === "output"
+            ? "bg-[#1a1a24] text-emerald-400"
+            : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
+            }`}
         >
           <TerminalIcon size={12} />
           Output
         </button>
         <button
           onClick={() => setActiveTab("input")}
-          className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
-            activeTab === "input"
-              ? "bg-[#1a1a24] text-violet-400"
-              : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
-          }`}
+          className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${activeTab === "input"
+            ? "bg-[#1a1a24] text-violet-400"
+            : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
+            }`}
         >
           <Keyboard size={12} />
           Input (stdin)
