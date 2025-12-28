@@ -1,0 +1,14 @@
+@import "tailwindcss";
+
+.remote-cursor {
+  border-left: 2px solid var(--cursor-color, red);
+}
+
+.remote-cursor-name {
+  background: rgba(0, 0, 0, 0.8);
+  color: white;
+  font-size: 10px;
+  padding: 2px 6px;
+  margin-left: 4px;
+  border-radius: 4px;
+}
