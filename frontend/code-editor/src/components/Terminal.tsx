@@ -1,4 +1,5 @@
 import { useState } from "react";
+import { Terminal as TerminalIcon, Keyboard } from "lucide-react";
 
 interface TerminalProps {
   output: string;
@@ -18,48 +19,58 @@ export default function Terminal({
   const [activeTab, setActiveTab] = useState<"output" | "input">("output");
 
   return (
-    <div className="h-48 bg-black text-green-400 font-mono text-sm border-t border-slate-800 flex flex-col">
-      <div className="flex items-center justify-between px-3 py-1 bg-slate-900 border-b border-slate-800">
-        <div className="flex gap-4">
-          <button
-            onClick={() => setActiveTab("output")}
-            className={`text-xs font-medium px-2 py-1 rounded ${activeTab === "output" ? "bg-slate-800 text-white" : "text-slate-400 hover:text-slate-200"
-              }`}
-          >
-            Output
-          </button>
-          <button
-            onClick={() => setActiveTab("input")}
-            className={`text-xs font-medium px-2 py-1 rounded ${activeTab === "input" ? "bg-slate-800 text-white" : "text-slate-400 hover:text-slate-200"
-              }`}
-          >
-            Input (Stdin)
-          </button>
-        </div>
+    <div className="flex-1 flex flex-col overflow-hidden">
+      <div className="flex items-center gap-1 px-2 py-1 bg-[#0a0a0f] border-b border-[#1e1e2e]">
         <button
-          onClick={onClose}
-          className="text-xs text-red-400 hover:text-red-500"
+          onClick={() => setActiveTab("output")}
+          className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+            activeTab === "output"
+              ? "bg-[#1a1a24] text-emerald-400"
+              : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
+          }`}
         >
-          ✕
+          <TerminalIcon size={12} />
+          Output
+        </button>
+        <button
+          onClick={() => setActiveTab("input")}
+          className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${
+            activeTab === "input"
+              ? "bg-[#1a1a24] text-violet-400"
+              : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
+          }`}
+        >
+          <Keyboard size={12} />
+          Input (stdin)
         </button>
       </div>
 
-      <div className="flex-1 p-3 overflow-auto">
+      <div className="flex-1 overflow-auto p-3 font-mono text-sm">
         {activeTab === "output" ? (
           isRunning ? (
-            <span className="text-yellow-400">Running…</span>
+            <div className="flex items-center gap-2 text-amber-400">
+              <div className="w-3 h-3 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
+              Running...
+            </div>
           ) : output ? (
-            <pre className="whitespace-pre-wrap">{output}</pre>
+            <pre className="whitespace-pre-wrap text-emerald-400 leading-relaxed">
+              {output}
+            </pre>
           ) : (
-            <span className="text-slate-500">No output</span>
+            <div className="flex flex-col items-center justify-center h-full text-slate-600 gap-2">
+              <TerminalIcon size={24} />
+              <span className="text-xs">Run your code to see output</span>
+            </div>
           )
         ) : (
-          <textarea
-            className="w-full h-full bg-transparent text-white resize-none outline-none placeholder-slate-600"
-            placeholder="Enter input for your program here..."
-            value={input}
-            onChange={(e) => onInputChange(e.target.value)}
-          />
+          <div className="h-full">
+            <textarea
+              className="w-full h-full bg-transparent text-slate-200 resize-none outline-none placeholder-slate-600 leading-relaxed"
+              placeholder="Enter input for your program here...&#10;&#10;Each line will be treated as separate input."
+              value={input}
+              onChange={(e) => onInputChange(e.target.value)}
+            />
+          </div>
         )}
       </div>
     </div>

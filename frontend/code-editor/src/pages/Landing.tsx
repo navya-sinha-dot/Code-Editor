@@ -1,98 +1,237 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import { Code2, Zap, Users, Terminal, Cpu, Globe } from "lucide-react";
+import {
+  Code2,
+  Zap,
+  Users,
+  Terminal,
+  Cpu,
+  Globe,
+  ArrowRight,
+  Play,
+  Sparkles,
+} from "lucide-react";
+import { getToken } from "../utils/token";
 
 export default function Landing() {
-  return (
-    <div className="min-h-screen bg-slate-950 text-white selection:bg-indigo-500 selection:text-white">
-      <div className="relative pt-32 pb-20 sm:pt-40 sm:pb-24 overflow-hidden">
-        <div className="absolute top-0 left-1/2 -translate-x-1/2 w-full h-full z-0 pointer-events-none">
-          <div className="absolute top-0 left-1/4 w-96 h-96 bg-indigo-500/20 rounded-full blur-3xl mix-blend-screen animate-pulse" />
-          <div className="absolute bottom-0 right-1/4 w-96 h-96 bg-purple-500/20 rounded-full blur-3xl mix-blend-screen animate-pulse delay-1000" />
-        </div>
+  const isLoggedIn = !!getToken();
 
-        <div className="relative z-10 max-w-7xl mx-auto px-6 text-center">
+  return (
+    <div className="min-h-screen bg-[#0a0a0f] text-white selection:bg-violet-500 selection:text-white overflow-hidden">
+      <div className="fixed inset-0 z-0">
+        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-violet-600/20 rounded-full blur-[120px] animate-pulse" />
+        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-indigo-600/20 rounded-full blur-[120px] animate-pulse delay-1000" />
+        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-600/10 rounded-full blur-[150px]" />
+      </div>
+
+      <div
+        className="fixed inset-0 z-0 opacity-[0.03]"
+        style={{
+          backgroundImage: `linear-gradient(rgba(255,255,255,.1) 1px, transparent 1px), linear-gradient(90deg, rgba(255,255,255,.1) 1px, transparent 1px)`,
+          backgroundSize: "50px 50px",
+        }}
+      />
+
+      <div className="relative z-10 pt-32 pb-20 sm:pt-30 sm:pb-32">
+        <div className="max-w-7xl mx-auto px-6 text-center">
           <motion.div
-            initial={{ opacity: 0, y: 20 }}
+            initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ duration: 0.8 }}
           >
-            <h1 className="text-5xl sm:text-7xl font-extrabold tracking-tight mb-8 bg-gradient-to-r from-indigo-400 via-purple-400 to-pink-400 text-transparent bg-clip-text">
-              Code Together. <br /> Build Faster.
+            <div className="inline-flex items-center gap-2 px-4 py-2 mb-4 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-300 text-sm font-medium">
+              <Sparkles size={16} />
+              <span>Real-time collaborative coding</span>
+            </div>
+
+            <h1 className="text-5xl sm:text-5xl lg:text-8xl font-black tracking-tight mb-8 leading-[1.1]">
+              <span className="bg-gradient-to-r from-white via-violet-200 to-violet-400 text-transparent bg-clip-text">
+                Code Together.
+              </span>
+              <br />
+              <span className="bg-gradient-to-r from-white via-violet-200 to-violet-400 text-transparent bg-clip-text">
+                Build Faster.
+              </span>
             </h1>
-            <p className="text-xl sm:text-2xl text-slate-400 mb-10 max-w-3xl mx-auto leading-relaxed">
-              A premium real-time collaborative code editor. Experience seamless
-              pair programming with built-in chat, instant sync, and powerful
-              tools.
+
+            <p className="text-lg sm:text-xl text-slate-400 mb-12 max-w-2xl mx-auto leading-relaxed">
+              A next-generation collaborative code editor. Experience seamless
+              pair programming with real-time sync, built-in terminal, and
+              instant chat.
             </p>
 
             <div className="flex flex-col sm:flex-row justify-center gap-4">
-              <Link
-                to="/signup"
-                className="px-8 py-4 bg-indigo-600 hover:bg-indigo-700 text-white text-lg font-semibold rounded-full transition-all shadow-lg hover:shadow-indigo-500/25 flex items-center justify-center gap-2"
-              >
-                Start Coding for Free <Zap size={20} />
-              </Link>
-              <Link
-                to="/login"
-                className="px-8 py-4 bg-slate-800 hover:bg-slate-700 text-white text-lg font-semibold rounded-full border border-slate-700 transition-all flex items-center justify-center gap-2"
-              >
-                Sign In
-              </Link>
+              {isLoggedIn ? (
+                <Link
+                  to="/dashboard"
+                  className="group px-8 py-4 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-lg font-semibold rounded-xl transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 flex items-center justify-center gap-3"
+                >
+                  Go to Dashboard
+                  <ArrowRight
+                    size={20}
+                    className="group-hover:translate-x-1 transition-transform"
+                  />
+                </Link>
+              ) : (
+                <>
+                  <Link
+                    to="/signup"
+                    className="group px-8 py-4 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-lg font-semibold rounded-xl transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 flex items-center justify-center gap-3"
+                  >
+                    Start Coding Free
+                    <ArrowRight
+                      size={20}
+                      className="group-hover:translate-x-1 transition-transform"
+                    />
+                  </Link>
+                  <Link
+                    to="/login"
+                    className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white text-lg font-semibold rounded-xl border border-white/10 hover:border-white/20 transition-all flex items-center justify-center gap-3"
+                  >
+                    Sign In
+                  </Link>
+                </>
+              )}
+            </div>
+          </motion.div>
+
+          <motion.div
+            initial={{ opacity: 0, y: 50 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.3 }}
+            className="mt-20 relative"
+          >
+            <div className="relative max-w-5xl mx-auto rounded-2xl border border-white/10 bg-[#12121a] shadow-2xl shadow-violet-500/10 overflow-hidden">
+              <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5 bg-[#0d0d12]">
+                <div className="flex gap-2">
+                  <div className="w-3 h-3 rounded-full bg-red-500/80" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
+                  <div className="w-3 h-3 rounded-full bg-green-500/80" />
+                </div>
+                <div className="flex-1 text-center text-sm text-slate-500 font-mono">
+                  main.ts
+                </div>
+              </div>
+
+              <div className="p-6 font-mono text-sm text-left">
+                <div className="flex gap-4">
+                  <div className="text-slate-600 select-none">
+                    1<br />2<br />3<br />4<br />5<br />6<br />7
+                  </div>
+                  <div>
+                    <span className="text-purple-400">const</span>{" "}
+                    <span className="text-blue-400">greeting</span> ={" "}
+                    <span className="text-amber-300">"Hello, World!"</span>;
+                    {"\n"}
+                    <br />
+                    <span className="text-purple-400">function</span>{" "}
+                    <span className="text-yellow-400">main</span>() {"{"}
+                    <br />
+                    {"  "}
+                    <span className="text-blue-400">console</span>.
+                    <span className="text-yellow-400">log</span>(
+                    <span className="text-blue-400">greeting</span>);
+                    <br />
+                    {"  "}
+                    <span className="text-purple-400">return</span>{" "}
+                    <span className="text-orange-400">0</span>;
+                    <br />
+                    {"}"}
+                    <br />
+                    <br />
+                    <span className="text-yellow-400">main</span>();
+                  </div>
+                </div>
+              </div>
+
+              <div className="absolute top-24 right-20 flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500 text-white text-xs font-medium shadow-lg shadow-violet-500/50">
+                <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
+                John is typing...
+              </div>
             </div>
           </motion.div>
         </div>
       </div>
 
-      <div className="py-24 bg-slate-900/50">
+      <div className="relative z-10 bg-gradient-to-b from-transparent via-[#0d0d14] to-[#0a0a0f]">
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
-            <h2 className="text-3xl sm:text-4xl font-bold mb-4">
-              Everything you need to build
+            <h2 className="text-4xl sm:text-5xl font-bold mb-6">
+              Built for <span className="text-violet-400">developers</span>
             </h2>
-            <p className="text-slate-400 max-w-2xl mx-auto">
-              Packed with features to make your coding experience smooth and
-              collaborative.
+            <p className="text-slate-400 max-w-2xl mx-auto text-lg">
+              Everything you need to collaborate on code in real-time.
             </p>
           </div>
 
-          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-8">
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
             <FeatureCard
-              icon={<Users className="text-indigo-400" size={32} />}
+              icon={<Users className="text-violet-400" size={28} />}
               title="Real-time Collaboration"
-              description="Edit code simultaneously with your team. See cursors and changes in real-time."
+              description="See your teammates' cursors and edits instantly. True pair programming experience."
             />
             <FeatureCard
-              icon={<Terminal className="text-purple-400" size={32} />}
+              icon={<Terminal className="text-emerald-400" size={28} />}
+              title="Integrated Terminal"
+              description="Run your code directly in the browser with our powerful code execution engine."
+            />
+            <FeatureCard
+              icon={<Code2 className="text-pink-400" size={28} />}
               title="Monaco Editor"
-              description="Powered by VS Code's editor engine for a familiar and powerful editing experience."
+              description="Powered by VS Code's editor. Syntax highlighting for 50+ languages."
             />
             <FeatureCard
-              icon={<Code2 className="text-pink-400" size={32} />}
-              title="Syntax Highlighting"
-              description="Support for multiple languages including TypeScript, JavaScript, Python, and C++."
-            />
-            <FeatureCard
-              icon={<Zap className="text-yellow-400" size={32} />}
+              icon={<Zap className="text-amber-400" size={28} />}
               title="Lightning Fast"
-              description="Optimized performance with WebSocket connections for instant updates."
+              description="WebSocket-powered sync ensures sub-50ms latency for all operations."
             />
             <FeatureCard
-              icon={<Cpu className="text-emerald-400" size={32} />}
+              icon={<Cpu className="text-cyan-400" size={28} />}
               title="Built-in Chat"
-              description="Communicate with your team without leaving the editor. Context is key."
+              description="Communicate without leaving the editor. Stay in context, stay productive."
             />
             <FeatureCard
-              icon={<Globe className="text-cyan-400" size={32} />}
+              icon={<Globe className="text-indigo-400" size={28} />}
               title="Cloud Sync"
-              description="Your code is saved automatically to the cloud. Never lose your work."
+              description="Your projects are automatically saved. Access from anywhere, anytime."
             />
           </div>
         </div>
       </div>
 
-      <footer className="py-12 bg-slate-950 border-t border-slate-900 text-center text-slate-500">
-        <p>© {new Date().getFullYear()} CodeFlow. Built for developers.</p>
+      <div className="relative z-10 py-24">
+        <div className="max-w-4xl mx-auto px-6 text-center">
+          <h2 className="text-4xl sm:text-5xl font-bold mb-6">
+            Ready to start coding?
+          </h2>
+          <p className="text-slate-400 mb-10 text-lg">
+            Join thousands of developers collaborating in real-time.
+          </p>
+          {isLoggedIn ? (
+            <Link
+              to="/dashboard"
+              className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xl font-semibold rounded-2xl transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40"
+            >
+              <Play size={24} />
+              Open Dashboard
+            </Link>
+          ) : (
+            <Link
+              to="/signup"
+              className="inline-flex items-center gap-3 px-10 py-5 bg-gradient-to-r from-violet-600 to-indigo-600 hover:from-violet-500 hover:to-indigo-500 text-white text-xl font-semibold rounded-2xl transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40"
+            >
+              <Play size={24} />
+              Get Started — It's Free
+            </Link>
+          )}
+        </div>
+      </div>
+
+      <footer className="relative z-10 py-12 border-t border-white/5 text-center text-slate-500">
+        <p>
+          © {new Date().getFullYear()} CodeFlow. Crafted for developers who
+          ship.
+        </p>
       </footer>
     </div>
   );
@@ -109,13 +248,14 @@ function FeatureCard({
 }) {
   return (
     <motion.div
-      whileHover={{ y: -5 }}
-      className="p-8 bg-slate-900 border border-slate-800 rounded-2xl hover:border-indigo-500/50 transition-colors"
+      whileHover={{ y: -4, scale: 1.02 }}
+      transition={{ duration: 0.2 }}
+      className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl hover:border-violet-500/30 hover:bg-violet-500/[0.03] transition-colors group"
     >
-      <div className="mb-4 bg-slate-800 w-14 h-14 rounded-xl flex items-center justify-center">
+      <div className="mb-4 p-3 bg-white/5 rounded-xl w-fit group-hover:bg-violet-500/10 transition-colors">
         {icon}
       </div>
-      <h3 className="text-xl font-bold mb-3">{title}</h3>
+      <h3 className="text-xl font-semibold mb-2 text-white">{title}</h3>
       <p className="text-slate-400 leading-relaxed">{description}</p>
     </motion.div>
   );

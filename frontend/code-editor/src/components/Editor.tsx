@@ -35,12 +35,20 @@ export default function Editor({ fileName }: EditorProps) {
     const yText = yProvider.getYDoc().getText(`file:${fileName}`);
     const token = getToken();
 
-    if (!token) {
-      setReady(true);
-      return;
-    }
+    const onSync = async (isSynced: boolean) => {
+      if (!isSynced) return;
 
-    (async () => {
+      if (yText.length > 0) {
+        hydratedRef.current = true;
+        setReady(true);
+        return;
+      }
+
+      if (!token) {
+        setReady(true);
+        return;
+      }
+
       try {
         const res = await axios.get(
           `http://localhost:3000/api/files/${roomId}/file/${fileName}`,
@@ -58,7 +66,17 @@ export default function Editor({ fileName }: EditorProps) {
         hydratedRef.current = true;
         setReady(true);
       }
-    })();
+    };
+
+    if (yProvider.synced) {
+      onSync(true);
+    } else {
+      yProvider.on("sync", onSync);
+    }
+
+    return () => {
+      yProvider.off("sync", onSync);
+    };
   }, [room, fileName, yProvider]);
 
   useEffect(() => {
