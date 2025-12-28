@@ -1,66 +1,70 @@
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Editor as MonacoEditor } from "@monaco-editor/react";
-import * as Y from "yjs";
 import { MonacoBinding } from "y-monaco";
 import { getYjsProviderForRoom } from "@liveblocks/yjs";
 import { useRoom, useMyPresence, useOthers } from "../../liveblocks.config";
 import type { editor } from "monaco-editor";
 import axios from "axios";
 import * as monaco from "monaco-editor";
+import { getToken } from "../utils/token";
+import { getLanguageFromFileName } from "../utils/fileUtils";
 
 interface EditorProps {
-  language: string;
+  fileName: string;
 }
 
-export default function Editor({ language }: EditorProps) {
+export default function Editor({ fileName }: EditorProps) {
   const room = useRoom();
+  const yProvider = getYjsProviderForRoom(room);
+
   const [editorRef, setEditorRef] =
     useState<editor.IStandaloneCodeEditor | null>(null);
-
   const [ready, setReady] = useState(false);
 
-  const yProvider = getYjsProviderForRoom(room);
   const hydratedRef = useRef(false);
 
-  const [_, updateMyPresence] = useMyPresence();
+  const [, updateMyPresence] = useMyPresence();
   const others = useOthers();
 
-  useEffect(() => {
-    if (!room || hydratedRef.current) return;
+  const fileLanguage = getLanguageFromFileName(fileName);
 
-    const [roomId, fileName] = room.id.split(":");
-    if (!roomId || !fileName) {
+  useEffect(() => {
+    if (!room || !fileName || hydratedRef.current) return;
+
+    const roomId = room.id;
+    const yText = yProvider.getYDoc().getText(`file:${fileName}`);
+    const token = getToken();
+
+    if (!token) {
       setReady(true);
       return;
     }
-
-    const yText = yProvider.getYDoc().getText("monaco");
 
     (async () => {
       try {
         const res = await axios.get(
           `http://localhost:3000/api/files/${roomId}/file/${fileName}`,
           {
-            headers: {
-              Authorization: `Bearer ${localStorage.getItem("token")}`,
-            },
+            headers: { Authorization: `Bearer ${token}` },
           }
         );
 
         if (res.data?.content && yText.length === 0) {
           yText.insert(0, res.data.content);
         }
+      } catch (e) {
+        console.error("Load failed");
       } finally {
         hydratedRef.current = true;
         setReady(true);
       }
     })();
-  }, [room, yProvider]);
+  }, [room, fileName, yProvider]);
 
   useEffect(() => {
     if (!editorRef || !ready) return;
 
-    const yText = yProvider.getYDoc().getText("monaco");
+    const yText = yProvider.getYDoc().getText(`file:${fileName}`);
 
     const binding = new MonacoBinding(
       yText,
@@ -69,31 +73,36 @@ export default function Editor({ language }: EditorProps) {
       yProvider.awareness as any
     );
 
+    const model = editorRef.getModel();
+    if (model) {
+      model.setValue(model.getValue());
+    }
+
     return () => binding.destroy();
-  }, [editorRef, ready, yProvider]);
+  }, [editorRef, ready, fileName, yProvider]);
 
   useEffect(() => {
     if (!room || !editorRef || !ready) return;
 
-    const [roomId, fileName] = room.id.split(":");
+    const roomId = room.id;
+    const token = getToken();
+    if (!token) return;
 
     const interval = setInterval(() => {
       axios.post(
         `http://localhost:3000/api/files/${roomId}/file/${fileName}`,
         {
           content: editorRef.getValue(),
-          language,
+          language: fileLanguage,
         },
         {
-          headers: {
-            Authorization: `Bearer ${localStorage.getItem("token")}`,
-          },
+          headers: { Authorization: `Bearer ${token}` },
         }
       );
     }, 2000);
 
     return () => clearInterval(interval);
-  }, [room, editorRef, ready, language]);
+  }, [room, editorRef, ready, fileName, fileLanguage]);
 
   useEffect(() => {
     if (!editorRef) return;
@@ -118,9 +127,6 @@ export default function Editor({ language }: EditorProps) {
         const cursor = other.presence?.cursor;
         if (!cursor) return null;
 
-        const color = stringToColor(other.connectionId);
-        const name = other.info?.name ?? "User";
-
         return {
           range: new monaco.Range(
             cursor.lineNumber,
@@ -130,13 +136,10 @@ export default function Editor({ language }: EditorProps) {
           ),
           options: {
             className: "remote-cursor",
-            afterContentClassName: "remote-cursor-label",
             after: {
-              content: name,
+              content: other.info?.name ?? "User",
               inlineClassName: "remote-cursor-name",
             },
-            stickiness:
-              monaco.editor.TrackedRangeStickiness.NeverGrowsWhenTypingAtEdges,
           },
         };
       })
@@ -144,17 +147,22 @@ export default function Editor({ language }: EditorProps) {
 
     editorRef.deltaDecorations([], decorations);
   }, [others, editorRef]);
+
   const handleMount = useCallback(
     (editorInstance: editor.IStandaloneCodeEditor) => {
       setEditorRef(editorInstance);
       (window as any).__EDITOR__ = editorInstance;
+      const model = editorInstance.getModel();
+      if (model) {
+        model.setValue(model.getValue());
+      }
     },
     []
   );
 
   if (!ready) {
     return (
-      <div className="flex h-full items-center justify-center bg-slate-950 text-slate-400">
+      <div className="flex h-full items-center justify-center text-slate-400">
         Loading file…
       </div>
     );
@@ -164,24 +172,15 @@ export default function Editor({ language }: EditorProps) {
     <MonacoEditor
       height="100%"
       theme="vs-dark"
-      language={language}
+      language={fileLanguage}
       onMount={handleMount}
       options={{
         fontSize: 14,
         minimap: { enabled: false },
+        automaticLayout: true,
+        scrollBeyondLastLine: false,
+        padding: { top: 16, bottom: 16 },
       }}
     />
   );
-}
-
-function stringToColor(id: number) {
-  const colors = [
-    "#ef4444",
-    "#22c55e",
-    "#3b82f6",
-    "#eab308",
-    "#a855f7",
-    "#ec4899",
-  ];
-  return colors[id % colors.length];
 }

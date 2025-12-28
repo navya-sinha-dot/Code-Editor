@@ -3,7 +3,6 @@ import mongoose from "mongoose";
 import { Room } from "../models/roommodels.js";
 import { authMiddleware } from "../middlewares/authmiddleware.js";
 const router = Router();
-//creating room
 router.post("/", authMiddleware, async (req, res) => {
     try {
         const { name } = req.body;
@@ -36,7 +35,6 @@ router.post("/", authMiddleware, async (req, res) => {
         });
     }
 });
-//joining room
 router.post("/:roomId/join", authMiddleware, async (req, res) => {
     try {
         if (!req.userId) {
@@ -69,7 +67,6 @@ router.post("/:roomId/join", authMiddleware, async (req, res) => {
         return res.status(500).json({ message: "Join room failed" });
     }
 });
-//fetching rooms
 router.get("/", authMiddleware, async (req, res) => {
     try {
         if (!req.userId) {
@@ -84,7 +81,6 @@ router.get("/", authMiddleware, async (req, res) => {
         res.status(500).json({ message: "Failed to fetch rooms" });
     }
 });
-//leaving a room
 router.post("/:roomId/leave", authMiddleware, async (req, res) => {
     try {
         const { roomId } = req.params;
@@ -103,7 +99,6 @@ router.post("/:roomId/leave", authMiddleware, async (req, res) => {
         res.status(500).json({ message: "Leave room failed" });
     }
 });
-//deleting a room
 router.delete("/:roomId", authMiddleware, async (req, res) => {
     try {
         const { roomId } = req.params;

@@ -56,8 +56,12 @@ router.post("/run", async (req, res) => {
       time: result.time,
       memory: result.memory,
     });
-  } catch (err) {
-    res.status(500).json({ error: "Execution failed" });
+  } catch (err: any) {
+    console.error("Executor Error:", err.response?.data || err.message);
+    res.status(500).json({
+      error: err.response?.data?.error || "Execution failed",
+      details: err.response?.data || err.message
+    });
   }
 });
 

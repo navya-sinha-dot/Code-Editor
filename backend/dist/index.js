@@ -1,3 +1,4 @@
+import "dotenv/config";
 import express from "express";
 import cors from "cors";
 import { createServer, IncomingMessage } from "http";
@@ -20,7 +21,6 @@ app.use("/api/auth", authRoutes);
 app.use("/api/rooms", roomRoutes);
 app.use("/api/files", fileRoutes);
 app.use("/api", runRoutes);
-// roomId -> sockets
 const rooms = new Map();
 wss.on("connection", async (ws, req) => {
     try {
@@ -35,7 +35,6 @@ wss.on("connection", async (ws, req) => {
         console.log("WebSocket authenticated:", ws.userId);
         ws.on("message", async (raw) => {
             const message = JSON.parse(raw.toString());
-            /* -------- JOIN ROOM -------- */
             if (message.type === "room:join") {
                 const { roomId } = message.payload;
                 if (!roomId || !ws.userId)
@@ -44,7 +43,6 @@ wss.on("connection", async (ws, req) => {
                     rooms.set(roomId, new Set());
                 }
                 rooms.get(roomId).add(ws);
-                /* SEND CHAT HISTORY */
                 const messages = await Message.find({ roomId })
                     .sort({ createdAt: 1 })
                     .limit(50)
@@ -63,7 +61,6 @@ wss.on("connection", async (ws, req) => {
                 }));
                 console.log(`${ws.userId} joined room ${roomId}`);
             }
-            /* -------- SEND CHAT -------- */
             if (message.type === "chat:send") {
                 const { roomId, text } = message.payload || {};
                 if (!ws.userId || !roomId || !text)

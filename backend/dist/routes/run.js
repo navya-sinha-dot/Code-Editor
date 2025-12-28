@@ -46,7 +46,11 @@ router.post("/run", async (req, res) => {
         });
     }
     catch (err) {
-        res.status(500).json({ error: "Execution failed" });
+        console.error("Executor Error:", err.response?.data || err.message);
+        res.status(500).json({
+            error: err.response?.data?.error || "Execution failed",
+            details: err.response?.data || err.message
+        });
     }
 });
 export default router;
