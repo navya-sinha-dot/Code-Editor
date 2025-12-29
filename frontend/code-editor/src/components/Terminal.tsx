@@ -1,5 +1,4 @@
 import { useState } from "react";
-import { Terminal as TerminalIcon, Keyboard } from "lucide-react";
 
 interface TerminalProps {
   output: string;
@@ -18,55 +17,45 @@ export default function Terminal({
 
   return (
     <div className="flex-1 flex flex-col overflow-hidden">
-      <div className="flex items-center gap-1 px-2 py-1 bg-[#0d0d0d] border-b border-[#2a2a2a]">
+      <div className="flex items-center gap-1 px-2 h-8 bg-[#252526] border-b border-[#3e3e42]">
         <button
           onClick={() => setActiveTab("output")}
-          className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${activeTab === "output"
-            ? "bg-[#1a1a24] text-emerald-400"
-            : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
-            }`}
+          className={`px-2 py-1 text-xs ${
+            activeTab === "output"
+              ? "text-[#cccccc] border-b border-[#BD67E0]"
+              : "text-[#858585] hover:text-[#cccccc]"
+          }`}
         >
-          <TerminalIcon size={12} />
           Output
         </button>
         <button
           onClick={() => setActiveTab("input")}
-          className={`flex items-center gap-2 px-3 py-1.5 text-xs font-medium rounded-md transition-colors ${activeTab === "input"
-            ? "bg-[#1a1a24] text-violet-400"
-            : "text-slate-500 hover:text-slate-300 hover:bg-white/5"
-            }`}
+          className={`px-2 py-1 text-xs ${
+            activeTab === "input"
+              ? "text-[#cccccc] border-b border-[#BD67E0]"
+              : "text-[#858585] hover:text-[#cccccc]"
+          }`}
         >
-          <Keyboard size={12} />
-          Input (stdin)
+          Input
         </button>
       </div>
 
-      <div className="flex-1 overflow-auto p-3 font-mono text-sm">
+      <div className="flex-1 overflow-auto p-2 font-mono text-xs">
         {activeTab === "output" ? (
           isRunning ? (
-            <div className="flex items-center gap-2 text-amber-400">
-              <div className="w-3 h-3 border-2 border-amber-400 border-t-transparent rounded-full animate-spin" />
-              Running...
-            </div>
+            <div className="text-[#cccccc]">Running...</div>
           ) : output ? (
-            <pre className="whitespace-pre-wrap text-emerald-400 leading-relaxed">
-              {output}
-            </pre>
+            <pre className="whitespace-pre-wrap text-[#cccccc]">{output}</pre>
           ) : (
-            <div className="flex flex-col items-center justify-center h-full text-slate-600 gap-2">
-              <TerminalIcon size={24} />
-              <span className="text-xs">Run your code to see output</span>
-            </div>
+            <div className="text-[#858585]">Run code to see output</div>
           )
         ) : (
-          <div className="h-full">
-            <textarea
-              className="w-full h-full bg-transparent text-slate-200 resize-none outline-none placeholder-slate-600 leading-relaxed"
-              placeholder="Enter input for your program here...&#10;&#10;Each line will be treated as separate input."
-              value={input}
-              onChange={(e) => onInputChange(e.target.value)}
-            />
-          </div>
+          <textarea
+            className="w-full h-full bg-transparent text-[#cccccc] resize-none outline-none placeholder-[#858585]"
+            placeholder="Input for stdin..."
+            value={input}
+            onChange={(e) => onInputChange(e.target.value)}
+          />
         )}
       </div>
     </div>

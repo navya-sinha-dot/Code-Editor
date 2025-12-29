@@ -34,11 +34,6 @@ export default function Landing() {
               transition={{ duration: 0.8 }}
               className="text-left"
             >
-              <div className="inline-flex items-center gap-2 px-4 py-2 mb-4 rounded-full border border-violet-500/30 bg-violet-500/10 text-violet-300 text-sm font-medium">
-                <Sparkles size={16} />
-                <span>Real-time collaborative coding</span>
-              </div>
-
               <h1 className="text-7xl font-black mb-8">
                 <span className="bg-gradient-to-r from-white via-violet-200 to-violet-400 text-transparent bg-clip-text">
                   Code Together.

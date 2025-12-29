@@ -9,11 +9,7 @@ import {
   Trash2,
   ChevronRight,
   ChevronDown,
-  FileCode,
-  FileJson,
-  FileText,
-  FilePlus,
-  FolderPlus,
+  X,
 } from "lucide-react";
 
 interface FileItem {
@@ -23,34 +19,6 @@ interface FileItem {
   parentId?: string | null;
 }
 
-const getFileIcon = (fileName: string) => {
-  const ext = fileName.split(".").pop()?.toLowerCase();
-  switch (ext) {
-    case "ts":
-    case "tsx":
-    case "js":
-    case "jsx":
-      return <FileCode size={16} className="text-blue-400" />;
-    case "json":
-      return <FileJson size={16} className="text-yellow-400" />;
-    case "py":
-      return <FileCode size={16} className="text-green-400" />;
-    case "cpp":
-    case "c":
-    case "h":
-      return <FileCode size={16} className="text-purple-400" />;
-    case "java":
-      return <FileCode size={16} className="text-orange-400" />;
-    case "html":
-    case "css":
-      return <FileCode size={16} className="text-pink-400" />;
-    case "md":
-      return <FileText size={16} className="text-slate-400" />;
-    default:
-      return <File size={16} className="text-slate-500" />;
-  }
-};
-
 export default function FileTree({ activeFileId, onSelectFile }: any) {
   const { roomId } = useParams();
   const [files, setFiles] = useState<FileItem[]>([]);
@@ -59,9 +27,8 @@ export default function FileTree({ activeFileId, onSelectFile }: any) {
     new Set()
   );
   const [showNewFileInput, setShowNewFileInput] = useState(false);
-  const [showNewFolderInput, setShowNewFolderInput] = useState(false);
   const [newItemName, setNewItemName] = useState("");
-  const [newItemParentId, setNewItemParentId] = useState<string | null>(null);
+  const [deleteModal, setDeleteModal] = useState<FileItem | null>(null);
 
   useEffect(() => {
     if (!roomId) return;
@@ -72,12 +39,9 @@ export default function FileTree({ activeFileId, onSelectFile }: any) {
     });
   }, [roomId]);
 
-  const handleCreateFile = async (parentId: string | null = null) => {
+  const handleCreateFile = async () => {
     if (!roomId || !newItemName.trim()) return;
 
-    const name = parentId
-      ? `${files.find((f) => f._id === parentId)?.name}/${newItemName}`
-      : newItemName;
     const language = newItemName.split(".").pop() || "plaintext";
 
     const res = await createFile({
@@ -85,42 +49,26 @@ export default function FileTree({ activeFileId, onSelectFile }: any) {
       name: newItemName,
       language,
       content: "",
-      parentId,
+      parentId: null,
     });
 
     setFiles((prev) => [...prev, res.data]);
     onSelectFile(res.data);
     setShowNewFileInput(false);
     setNewItemName("");
-    setNewItemParentId(null);
   };
 
-  const handleCreateFolder = async (parentId: string | null = null) => {
-    if (!roomId || !newItemName.trim()) return;
+  const confirmDelete = async () => {
+    if (!deleteModal) return;
 
-    const res = await createFile({
-      roomId,
-      name: newItemName,
-      isFolder: true,
-      parentId,
-    });
+    await deleteFile(deleteModal._id);
+    setFiles((prev) => prev.filter((f) => f._id !== deleteModal._id));
 
-    setFiles((prev) => [...prev, { ...res.data, isFolder: true }]);
-    setShowNewFolderInput(false);
-    setNewItemName("");
-    setNewItemParentId(null);
-  };
-
-  const handleDeleteFile = async (file: FileItem, e: React.MouseEvent) => {
-    e.stopPropagation();
-    if (!confirm(`Delete "${file.name}"?`)) return;
-
-    await deleteFile(file._id);
-    setFiles((prev) => prev.filter((f) => f._id !== file._id));
-
-    if (activeFileId === file._id) {
+    if (activeFileId === deleteModal._id) {
       onSelectFile(null);
     }
+
+    setDeleteModal(null);
   };
 
   const toggleFolder = (folderId: string) => {
@@ -135,27 +83,8 @@ export default function FileTree({ activeFileId, onSelectFile }: any) {
     });
   };
 
-  const startNewFile = (parentId: string | null = null) => {
-    setShowNewFileInput(true);
-    setShowNewFolderInput(false);
-    setNewItemParentId(parentId);
-    setNewItemName("");
-  };
-
-  const startNewFolder = (parentId: string | null = null) => {
-    setShowNewFolderInput(true);
-    setShowNewFileInput(false);
-    setNewItemParentId(parentId);
-    setNewItemName("");
-  };
-
   if (loading) {
-    return (
-      <div className="p-4 text-slate-500 text-sm flex items-center gap-2">
-        <div className="w-4 h-4 border-2 border-slate-600 border-t-violet-500 rounded-full animate-spin" />
-        Loading...
-      </div>
-    );
+    return <div className="p-3 text-[#858585] text-xs">Loading...</div>;
   }
 
   const rootFiles = files.filter((f) => !f.parentId);
@@ -173,68 +102,44 @@ export default function FileTree({ activeFileId, onSelectFile }: any) {
           onClick={() =>
             isFolder ? toggleFolder(file._id) : onSelectFile(file)
           }
-          className={`group flex items-center gap-2 px-2 py-1.5 cursor-pointer transition-colors ${
-            activeFileId === file._id
-              ? "bg-violet-500/15 text-violet-300"
-              : "text-slate-400 hover:bg-white/5 hover:text-slate-200"
+          className={`group flex items-center gap-1.5 px-2 py-1 cursor-pointer ${
+            activeFileId === file._id ? "bg-[#37373d]" : "hover:bg-[#2a2d2e]"
           }`}
-          style={{ paddingLeft: `${12 + depth * 16}px` }}
+          style={{ paddingLeft: `${8 + depth * 16}px` }}
         >
           {isFolder ? (
             <>
               {isExpanded ? (
-                <ChevronDown size={14} className="text-slate-500" />
+                <ChevronDown size={14} className="text-[#858585]" />
               ) : (
-                <ChevronRight size={14} className="text-slate-500" />
+                <ChevronRight size={14} className="text-[#858585]" />
               )}
               {isExpanded ? (
-                <FolderOpen size={16} className="text-violet-400" />
+                <FolderOpen size={16} className="text-[#dcb67a]" />
               ) : (
-                <Folder size={16} className="text-violet-400" />
+                <Folder size={16} className="text-[#dcb67a]" />
               )}
             </>
           ) : (
             <>
-              <span className="w-[14px]" />
-              {getFileIcon(file.name)}
+              <span className="w-3.5" />
+              <File size={16} className="text-[#858585]" />
             </>
           )}
 
-          <span className="flex-1 text-sm font-mono truncate">{file.name}</span>
+          <span className="flex-1 text-sm text-[#cccccc] truncate">
+            {file.name}
+          </span>
 
-          <div className="flex items-center gap-1 opacity-0 group-hover:opacity-100 transition-opacity">
-            {isFolder && (
-              <>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    startNewFile(file._id);
-                  }}
-                  className="p-1 hover:bg-white/10 rounded"
-                  title="New File"
-                >
-                  <FilePlus size={12} className="text-slate-500" />
-                </button>
-                <button
-                  onClick={(e) => {
-                    e.stopPropagation();
-                    startNewFolder(file._id);
-                  }}
-                  className="p-1 hover:bg-white/10 rounded"
-                  title="New Folder"
-                >
-                  <FolderPlus size={12} className="text-slate-500" />
-                </button>
-              </>
-            )}
-            <button
-              onClick={(e) => handleDeleteFile(file, e)}
-              className="p-1 hover:bg-red-500/20 rounded"
-              title="Delete"
-            >
-              <Trash2 size={12} className="text-red-400" />
-            </button>
-          </div>
+          <button
+            onClick={(e) => {
+              e.stopPropagation();
+              setDeleteModal(file);
+            }}
+            className="opacity-0 group-hover:opacity-100 p-0.5 hover:bg-[#3e3e42] rounded-sm"
+          >
+            <Trash2 size={12} className="text-[#858585]" />
+          </button>
         </div>
 
         {isFolder && isExpanded && (
@@ -245,78 +150,93 @@ export default function FileTree({ activeFileId, onSelectFile }: any) {
   };
 
   return (
-    <div className="h-full flex flex-col bg-[#0d0d14] text-slate-300">
-      <div className="h-10 flex items-center justify-between px-3 border-b border-[#1e1e2e] bg-[#0a0a0f]">
-        <span className="text-xs font-semibold text-slate-500 uppercase tracking-wider">
-          Explorer
-        </span>
-        <div className="flex items-center gap-1">
+    <>
+      <div className="h-full flex flex-col">
+        <div className="h-9 flex items-center justify-between px-2 border-b border-[#3e3e42]">
+          <span className="text-xs text-[#cccccc] uppercase">Explorer</span>
           <button
-            onClick={() => startNewFile(null)}
-            className="p-1.5 text-slate-500 hover:text-violet-400 hover:bg-violet-500/10 rounded transition-colors"
-            title="New File"
+            onClick={() => setShowNewFileInput(true)}
+            className="p-1 text-[#858585] hover:bg-[#2a2d2e] rounded-sm"
           >
-            <FilePlus size={16} />
-          </button>
-          <button
-            onClick={() => startNewFolder(null)}
-            className="p-1.5 text-slate-500 hover:text-violet-400 hover:bg-violet-500/10 rounded transition-colors"
-            title="New Folder"
-          >
-            <FolderPlus size={16} />
+            <Plus size={14} />
           </button>
         </div>
-      </div>
 
-      {(showNewFileInput || showNewFolderInput) && (
-        <div className="px-3 py-2 border-b border-[#1e1e2e] bg-[#0a0a0f]">
-          <div className="flex items-center gap-2">
-            {showNewFileInput ? (
-              <File size={14} className="text-slate-500" />
-            ) : (
-              <Folder size={14} className="text-violet-400" />
-            )}
+        {showNewFileInput && (
+          <div className="px-2 py-1 border-b border-[#3e3e42]">
             <input
               type="text"
               value={newItemName}
               onChange={(e) => setNewItemName(e.target.value)}
               onKeyDown={(e) => {
                 if (e.key === "Enter") {
-                  showNewFileInput
-                    ? handleCreateFile(newItemParentId)
-                    : handleCreateFolder(newItemParentId);
+                  handleCreateFile();
                 } else if (e.key === "Escape") {
                   setShowNewFileInput(false);
-                  setShowNewFolderInput(false);
                   setNewItemName("");
                 }
               }}
-              placeholder={showNewFileInput ? "filename.ext" : "folder name"}
-              className="flex-1 bg-[#1a1a24] border border-violet-500/30 rounded px-2 py-1 text-sm text-slate-200 placeholder-slate-600 focus:outline-none focus:border-violet-500"
+              placeholder="filename.ext"
+              className="w-full px-2 py-1 bg-[#3c3c3c] border border-[#007acc] rounded-sm text-xs text-[#cccccc] placeholder-[#858585] focus:outline-none"
               autoFocus
             />
           </div>
+        )}
+
+        <div className="flex-1 overflow-auto py-1">
+          {files.length === 0 && !showNewFileInput ? (
+            <div className="px-3 py-8 text-center text-xs text-[#858585]">
+              No files yet
+            </div>
+          ) : (
+            rootFiles.map((file) => renderFileItem(file))
+          )}
+        </div>
+      </div>
+
+      {deleteModal && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center">
+          <div
+            className="absolute inset-0 backdrop-blur-md"
+            onClick={() => setDeleteModal(null)}
+          />
+          <div className="relative bg-[#252526] border border-[#3e3e42] rounded-2xl shadow-xl w-96">
+            <div className="flex items-center justify-between p-4 ">
+              <h3 className="text-xl font-medium text-[#cccccc]">
+                Delete File
+              </h3>
+              <button
+                onClick={() => setDeleteModal(null)}
+                className=" cursor:pointer text-[#858585] hover:text-[#cccccc]"
+              >
+                <X size={16} />
+              </button>
+            </div>
+            <div className="p-3">
+              <p className="text-md text-[#cccccc] mb-1">
+                Are you sure you want to delete this file?
+              </p>
+              <p className="text-sm text-[#858585] font-mono">
+                {deleteModal.name}
+              </p>
+            </div>
+            <div className="flex items-center justify-end gap-2 p-4 border-t border-[#3e3e42]">
+              <button
+                onClick={() => setDeleteModal(null)}
+                className="px-3 py-1.5 text-xs text-[#cccccc] hover:bg-[#2a2d2e] rounded-sm"
+              >
+                Cancel
+              </button>
+              <button
+                onClick={confirmDelete}
+                className="px-3 py-1.5 text-xs hover:bg-[#6B0B8F] bg-[#480663] text-white rounded-sm"
+              >
+                Delete
+              </button>
+            </div>
+          </div>
         </div>
       )}
-
-      <div className="flex-1 overflow-auto py-2">
-        {files.length === 0 && !showNewFileInput && !showNewFolderInput ? (
-          <div className="px-4 py-8 text-center">
-            <div className="w-12 h-12 mx-auto mb-3 rounded-xl bg-[#1a1a24] flex items-center justify-center">
-              <Folder size={24} className="text-slate-600" />
-            </div>
-            <p className="text-sm text-slate-500 mb-3">No files yet</p>
-            <button
-              onClick={() => startNewFile(null)}
-              className="text-sm text-violet-400 hover:text-violet-300 transition-colors"
-            >
-              Create your first file
-            </button>
-          </div>
-        ) : (
-          rootFiles.map((file) => renderFileItem(file))
-        )}
-      </div>
-    </div>
+    </>
   );
 }

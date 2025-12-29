@@ -11,7 +11,7 @@ import {
   ArrowRight,
   Sparkles,
   Copy,
-  Check
+  Check,
 } from "lucide-react";
 import { motion } from "framer-motion";
 
@@ -35,10 +35,7 @@ export default function Dashboard() {
         setRooms(data);
         setLoading(false);
       })
-      .catch((err) => {
-        console.error(err);
-        setLoading(false);
-      });
+      .catch(() => setLoading(false));
   }, []);
 
   const createRoom = async () => {
@@ -59,10 +56,8 @@ export default function Dashboard() {
     }
 
     const room = await res.json();
-
     setRooms((prev) => [room, ...prev]);
     setNewRoomName("");
-
     navigate(`/editor/${room._id}`);
   };
 
@@ -91,49 +86,29 @@ export default function Dashboard() {
     e.stopPropagation();
     navigator.clipboard.writeText(id);
     setCopiedId(id);
-    setTimeout(() => setCopiedId(null), 2000);
+    setTimeout(() => setCopiedId(null), 1500);
   };
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-slate-100 pt-20">
-      {/* Background effects */}
-      <div className="fixed inset-0 z-0">
-        <div className="absolute top-1/4 right-1/4 w-[400px] h-[400px] bg-violet-600/10 rounded-full blur-[100px]" />
-        <div className="absolute bottom-1/4 left-1/4 w-[300px] h-[300px] bg-indigo-600/10 rounded-full blur-[100px]" />
-      </div>
-
-      <div className="relative z-10 max-w-6xl mx-auto px-6 py-8">
+      <div className="max-w-6xl mx-auto px-6 py-10">
         {/* Header */}
-        <header className="mb-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5 }}
-          >
-            <div className="flex items-center gap-3 mb-3">
-              <div className="p-2 rounded-xl bg-violet-500/10 border border-violet-500/20">
-                <Sparkles size={24} className="text-violet-400" />
-              </div>
-              <h1 className="text-3xl font-bold">Dashboard</h1>
-            </div>
-            <p className="text-slate-500">
-              Manage your projects and collaboration sessions.
-            </p>
-          </motion.div>
-        </header>
+        <div className="mb-10">
+          <div className="flex items-center gap-3 mb-2">
+            <Sparkles className="text-violet-400" size={22} />
+            <h1 className="text-3xl font-semibold tracking-tight">Dashboard</h1>
+          </div>
+          <p className="text-slate-500 text-sm">
+            Create or join collaboration sessions.
+          </p>
+        </div>
 
-        {/* Action Cards */}
+        {/* Create / Join */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.1 }}
-            className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-violet-500/30 transition-colors"
-          >
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-violet-500/10">
-                <Plus className="text-violet-400" size={20} />
-              </div>
+          {/* Create */}
+          <div className="rounded-xl bg-[#12121a] border border-white/5 p-6">
+            <h2 className="text-sm font-medium text-slate-300 mb-4 flex items-center gap-2">
+              <Plus size={16} className="text-violet-400" />
               New Project
             </h2>
             <div className="flex gap-3">
@@ -141,29 +116,23 @@ export default function Dashboard() {
                 value={newRoomName}
                 onChange={(e) => setNewRoomName(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && createRoom()}
-                placeholder="Project Name"
-                className="flex-1 bg-[#1a1a24] border border-[#2a2a3a] rounded-xl px-4 py-3 focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 text-white placeholder-slate-600 transition-all"
+                placeholder="Project name"
+                className="flex-1 bg-[#1a1a24] border border-[#2a2a3a] rounded-lg px-4 py-2.5 text-sm focus:outline-none focus:border-violet-500/50"
               />
               <button
                 onClick={createRoom}
-                className="bg-violet-600 hover:bg-violet-500 text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center gap-2"
+                className="bg-[#4C1170] hover:bg-[#6B0B8F] px-4 rounded-lg text-sm font-medium flex items-center gap-2"
               >
                 Create
-                <ArrowRight size={16} />
+                <ArrowRight size={14} />
               </button>
             </div>
-          </motion.div>
+          </div>
 
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.5, delay: 0.2 }}
-            className="p-6 rounded-2xl bg-white/[0.02] border border-white/5 hover:border-emerald-500/30 transition-colors"
-          >
-            <h2 className="text-xl font-semibold mb-4 flex items-center gap-3">
-              <div className="p-2 rounded-lg bg-emerald-500/10">
-                <LogIn className="text-emerald-400" size={20} />
-              </div>
+          {/* Join */}
+          <div className="rounded-xl bg-[#12121a] border border-white/5 p-6">
+            <h2 className="text-sm font-medium text-slate-300 mb-4 flex items-center gap-2">
+              <LogIn size={16} className="text-violet-400" />
               Join Session
             </h2>
             <div className="flex gap-3">
@@ -171,66 +140,49 @@ export default function Dashboard() {
                 value={joinRoomId}
                 onChange={(e) => setJoinRoomId(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && joinRoom()}
-                placeholder="Paste Room ID"
-                className="flex-1 bg-[#1a1a24] border border-[#2a2a3a] rounded-xl px-4 py-3 focus:outline-none focus:border-emerald-500/50 focus:ring-1 focus:ring-emerald-500/20 text-white placeholder-slate-600 font-mono transition-all"
+                placeholder="Room ID"
+                className="flex-1 bg-[#1a1a24] border border-[#2a2a3a] rounded-lg px-4 py-2.5 text-sm font-mono focus:outline-none focus:border-violet-500/50"
               />
               <button
                 onClick={joinRoom}
-                className="bg-emerald-600 hover:bg-emerald-500 text-white px-6 py-3 rounded-xl font-medium transition-colors flex items-center gap-2"
+                className="bg-[#4C1170] hover:bg-[#6B0B8F] px-4 rounded-lg text-sm font-medium flex items-center gap-2"
               >
                 Join
-                <Users size={16} />
+                <Users size={14} />
               </button>
             </div>
-          </motion.div>
+          </div>
         </div>
 
-        {/* Projects List */}
-        <motion.div
-          initial={{ opacity: 0, y: 20 }}
-          animate={{ opacity: 1, y: 0 }}
-          transition={{ duration: 0.5, delay: 0.3 }}
-        >
-          <h2 className="text-xl font-bold mb-6 flex items-center gap-3">
-            <Folder className="text-violet-400" size={20} />
+        {/* Projects */}
+        <div>
+          <h2 className="text-md font-medium text-slate-400 mb-4 flex items-center gap-2">
+            <Folder size={16} className="text-violet-400" />
             Your Projects
           </h2>
 
           {loading ? (
-            <div className="flex items-center justify-center py-12 text-slate-500 gap-3">
-              <div className="w-5 h-5 border-2 border-slate-600 border-t-violet-500 rounded-full animate-spin" />
-              Loading projects...
+            <div className="py-12 text-center text-slate-500 text-sm">
+              Loading projects…
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
               {rooms.length === 0 && (
-                <div className="col-span-full py-16 text-center rounded-2xl bg-white/[0.01] border border-dashed border-white/10">
-                  <div className="w-16 h-16 mx-auto mb-4 rounded-2xl bg-[#1a1a24] flex items-center justify-center">
-                    <Folder size={32} className="text-slate-600" />
-                  </div>
-                  <p className="text-slate-500 mb-1">No projects yet</p>
-                  <p className="text-sm text-slate-600">
-                    Create your first project above to get started
-                  </p>
+                <div className="col-span-full py-14 text-center border border-dashed border-white/10 rounded-xl text-slate-500 text-sm">
+                  No projects yet
                 </div>
               )}
 
-              {rooms.map((room, index) => (
-                <motion.div
+              {rooms.map((room) => (
+                <div
                   key={room._id}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  transition={{ duration: 0.3, delay: index * 0.05 }}
                   onClick={() => navigate(`/editor/${room._id}`)}
-                  className="group p-5 rounded-xl bg-white/[0.02] border border-white/5 cursor-pointer hover:border-violet-500/30 hover:bg-violet-500/[0.02] transition-all"
+                  className="group cursor-pointer rounded-xl bg-[#12121a] border border-white/5 p-5 hover:border-violet-500/30 transition"
                 >
-                  <div className="flex items-start justify-between mb-4">
-                    <div className="p-2.5 bg-violet-500/10 rounded-xl group-hover:bg-violet-500/20 transition-colors">
-                      <Hash className="text-violet-400" size={18} />
-                    </div>
+                  <div className="flex items-center justify-between mb-3">
                     <button
                       onClick={(e) => copyRoomId(room._id, e)}
-                      className="flex items-center gap-1.5 px-2 py-1 text-xs text-slate-500 bg-[#1a1a24] hover:bg-[#2a2a3a] rounded-lg font-mono transition-colors"
+                      className="text-xs font-mono text-slate-500 hover:text-slate-300 flex items-center gap-1"
                     >
                       {copiedId === room._id ? (
                         <>
@@ -245,18 +197,20 @@ export default function Dashboard() {
                       )}
                     </button>
                   </div>
-                  <h3 className="text-lg font-semibold text-slate-200 group-hover:text-white transition-colors mb-2">
+
+                  <h3 className="text-base font-medium text-slate-200 mb-2 group-hover:text-white">
                     {room.name || "Untitled Project"}
                   </h3>
+
                   <div className="flex items-center gap-2 text-xs text-slate-600">
                     <Clock size={12} />
-                    <span>Last edited recently</span>
+                    Recently updated
                   </div>
-                </motion.div>
+                </div>
               ))}
             </div>
           )}
-        </motion.div>
+        </div>
       </div>
     </div>
   );

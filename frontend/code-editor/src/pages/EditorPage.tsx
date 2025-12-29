@@ -7,14 +7,7 @@ import Terminal from "../components/Terminal";
 import { runCode } from "../api/runcode";
 import { RoomProvider } from "../../liveblocks.config";
 import { getLanguageFromFileName } from "../utils/fileUtils";
-import {
-  Play,
-  MessageSquare,
-  Terminal as TerminalIcon,
-  X,
-  Maximize2,
-  Minimize2,
-} from "lucide-react";
+import { Play, MessageSquare, Terminal as TerminalIcon, X } from "lucide-react";
 
 export default function EditorPage() {
   const { roomId } = useParams();
@@ -26,7 +19,6 @@ export default function EditorPage() {
   } | null>(null);
 
   const [showTerminal, setShowTerminal] = useState(true);
-  const [terminalHeight, setTerminalHeight] = useState(200);
   const [terminalOutput, setTerminalOutput] = useState("");
   const [stdin, setStdin] = useState("");
   const [isRunning, setIsRunning] = useState(false);
@@ -49,30 +41,26 @@ export default function EditorPage() {
 
       setTerminalOutput(
         result.stdout ||
-        result.stderr ||
-        result.compile_output ||
-        result.status ||
-        "No output"
+          result.stderr ||
+          result.compile_output ||
+          result.status ||
+          "No output"
       );
     } catch (err: any) {
       setTerminalOutput(
         err?.response?.data?.error ||
-        err?.message ||
-        JSON.stringify(err, null, 2)
+          err?.message ||
+          JSON.stringify(err, null, 2)
       );
     } finally {
       setIsRunning(false);
     }
   };
 
-  const toggleTerminalSize = () => {
-    setTerminalHeight(terminalHeight === 200 ? 400 : 200);
-  };
-
   return (
     <RoomProvider id={roomId} initialPresence={{ cursor: null }}>
-      <div className="flex h-[calc(100vh-48px)] bg-[#0a0a0f]">
-        <div className="w-60 border-r border-[#1e1e2e] bg-[#0d0d14] flex flex-col">
+      <div className="flex h-[calc(100vh-48px)] bg-[#1e1e1e]">
+        <div className="w-56 bg-[#252526] border-r border-[#3e3e42]">
           <FileTree
             activeFileId={activeFile?._id}
             onSelectFile={setActiveFile}
@@ -80,106 +68,75 @@ export default function EditorPage() {
         </div>
 
         <div className="flex-1 flex flex-col min-w-0">
-          <div className="h-10 border-b border-[#1e1e2e] flex items-center justify-between px-2 bg-[#0d0d14]">
+          <div className="h-9 bg-[#252526] border-b border-[#3e3e42] flex items-center justify-between px-3">
             <div className="flex items-center gap-1">
               {activeFile && (
-                <div className="flex items-center gap-2 px-3 py-1.5 bg-[#1a1a24] rounded-t-lg border-t border-l border-r border-[#2a2a3a] text-sm">
-                  <span className="text-slate-300 font-mono">
-                    {activeFile.name}
-                  </span>
+                <div className="flex items-center gap-2 px-2 py-1 text-sm text-[#cccccc] bg-[#1e1e1e]">
+                  <span className="text-xs">{activeFile.name}</span>
                   <button
                     onClick={() => setActiveFile(null)}
-                    className="text-slate-500 hover:text-slate-300 transition-colors"
+                    className="text-[#858585] hover:text-[#cccccc]"
                   >
-                    <X size={14} />
+                    <X size={12} />
                   </button>
                 </div>
               )}
             </div>
 
-            <div className="flex items-center gap-2">
+            <div className="flex items-center gap-1">
               <button
                 onClick={handleRun}
                 disabled={isRunning || !activeFile}
-                className="flex items-center gap-2 px-3 py-1.5 text-sm font-medium bg-emerald-800 hover:bg-emerald-500 disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-lg transition-colors"
+                className="flex items-center gap-1.5 px-2 py-1 text-xs hover:bg-[#6B0B8F] bg-[#480663] disabled:opacity-40 disabled:cursor-not-allowed text-white rounded-sm"
               >
-                <Play size={14} />
-                {isRunning ? "Running..." : "Run"}
+                <Play size={12} />
+                {isRunning ? "Running" : "Run"}
               </button>
 
               <button
                 onClick={() => setShowTerminal(!showTerminal)}
-                className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${showTerminal
-                  ? "bg-[#1a1a24] text-violet-400 border border-violet-500/30"
-                  : "text-slate-400 hover:bg-[#1a1a24] hover:text-slate-300"
-                  }`}
+                className={`p-1.5 rounded-sm ${
+                  showTerminal
+                    ? "bg-[#37373d] text-[#cccccc]"
+                    : "text-[#858585] hover:bg-[#2a2d2e]"
+                }`}
               >
                 <TerminalIcon size={14} />
-                Terminal
               </button>
 
               <button
                 onClick={() => setShowChat(!showChat)}
-                className={`flex items-center gap-2 px-3 py-1.5 text-sm font-medium rounded-lg transition-colors ${showChat
-                  ? "bg-[#1a1a24] text-violet-400 border border-violet-500/30"
-                  : "text-slate-400 hover:bg-[#1a1a24] hover:text-slate-300"
-                  }`}
+                className={`p-1.5 rounded-sm ${
+                  showChat
+                    ? "bg-[#37373d] text-[#cccccc]"
+                    : "text-[#858585] hover:bg-[#2a2d2e]"
+                }`}
               >
                 <MessageSquare size={14} />
-                Chat
               </button>
             </div>
           </div>
 
-          <div className="flex-1 overflow-hidden relative bg-[#1e1e1e]">
+          <div className="flex-1 overflow-hidden">
             {activeFile ? (
               <Editor key={activeFile._id} fileName={activeFile.name} />
             ) : (
-              <div className="flex flex-col items-center justify-center h-full text-slate-500 gap-4">
-                <div className="w-16 h-16 rounded-2xl bg-[#1a1a24] flex items-center justify-center">
-                  <TerminalIcon size={32} className="text-slate-600" />
-                </div>
-                <div className="text-center">
-                  <p className="text-lg font-medium text-slate-400">
-                    No file selected
-                  </p>
-                  <p className="text-sm text-slate-600">
-                    Create or select a file from the explorer to start coding
-                  </p>
-                </div>
+              <div className="flex items-center justify-center h-full text-[#858585] text-sm">
+                No file selected
               </div>
             )}
           </div>
 
           {showTerminal && (
-            <div
-              className="border-t border-[#2a2a2a] bg-[#0d0d0d] flex flex-col"
-              style={{ height: terminalHeight }}
-            >
-              <div className="flex items-center justify-between px-3 py-1.5 bg-[#141414] border-b border-[#2a2a2a]">
-                <div className="flex items-center gap-4">
-                  <span className="text-xs font-medium text-slate-400 uppercase tracking-wider">
-                    Terminal
-                  </span>
-                </div>
-                <div className="flex items-center gap-1">
-                  <button
-                    onClick={toggleTerminalSize}
-                    className="p-1 text-slate-500 hover:text-slate-300 transition-colors"
-                  >
-                    {terminalHeight === 200 ? (
-                      <Maximize2 size={14} />
-                    ) : (
-                      <Minimize2 size={14} />
-                    )}
-                  </button>
-                  <button
-                    onClick={() => setShowTerminal(false)}
-                    className="p-1 text-slate-500 hover:text-slate-300 transition-colors"
-                  >
-                    <X size={14} />
-                  </button>
-                </div>
+            <div className="h-56 bg-[#1e1e1e] border-t border-[#3e3e42] flex flex-col">
+              <div className="flex items-center justify-between h-9 px-3 bg-[#252526]">
+                <span className="text-xs text-[#cccccc]">Terminal</span>
+                <button
+                  onClick={() => setShowTerminal(false)}
+                  className="text-[#858585] hover:text-[#cccccc]"
+                >
+                  <X size={12} />
+                </button>
               </div>
               <Terminal
                 output={terminalOutput}
@@ -192,7 +149,7 @@ export default function EditorPage() {
         </div>
 
         {showChat && (
-          <div className="w-80 border-l border-[#1e1e2e] bg-[#0d0d14] flex flex-col">
+          <div className="w-80 bg-[#252526] border-l border-[#3e3e42]">
             <Chat roomId={roomId} />
           </div>
         )}

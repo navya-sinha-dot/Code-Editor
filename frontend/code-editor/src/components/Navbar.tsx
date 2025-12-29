@@ -36,7 +36,7 @@ export default function Navbar() {
 
         <button
           onClick={handleLogout}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm text-slate-400 hover:text-red-400 hover:bg-red-500/10 rounded-lg transition-all"
+          className="flex items-center gap-2 px-3 py-1.5 text-sm text-slate-400 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-all"
         >
           <LogOut size={16} />
           <span className="hidden sm:inline">Logout</span>
@@ -67,7 +67,7 @@ export default function Navbar() {
             </Link>
             <button
               onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 text-slate-400 hover:text-red-400 hover:bg-red-500/10 border border-transparent hover:border-red-500/20 rounded-lg transition-all"
+              className="flex items-center gap-2 px-4 py-2 text-slate-400 hover:text-violet-400 hover:bg-violet-500/10 border border-transparent hover:border-violet-500/20 rounded-lg transition-all"
             >
               <LogOut size={18} />
               <span>Logout</span>
