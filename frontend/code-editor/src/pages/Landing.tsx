@@ -17,12 +17,6 @@ export default function Landing() {
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white selection:text-white overflow-hidden">
-      <div className="fixed inset-0 z-0">
-        <div className="absolute top-1/4 left-1/4 w-[600px] h-[600px] bg-violet-800/20 rounded-full blur-[120px] animate-pulse" />
-        <div className="absolute bottom-1/4 right-1/4 w-[500px] h-[500px] bg-indigo-800/20 rounded-full blur-[120px] animate-pulse delay-1000" />
-        <div className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[800px] bg-purple-900/10 rounded-full blur-[150px]" />
-      </div>
-
       <div className="relative z-10 pt-32 pb-20 sm:pt-30 sm:pb-32">
         <div className="max-w-7xl mx-auto px-6">
           <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
@@ -33,11 +27,11 @@ export default function Landing() {
               className="text-left"
             >
               <h1 className="text-7xl font-black mb-8">
-                <span className="bg-gradient-to-r from-white via-violet-200 to-violet-400 text-transparent bg-clip-text">
+                <span className="bg-white text-transparent bg-clip-text">
                   Code Together.
                 </span>
                 <br />
-                <span className="bg-gradient-to-r from-white via-violet-200 to-violet-400 text-transparent bg-clip-text">
+                <span className="bg-white text-transparent bg-clip-text">
                   Build Faster.
                 </span>
               </h1>
@@ -52,7 +46,7 @@ export default function Landing() {
                 {isLoggedIn ? (
                   <Link
                     to="/dashboard"
-                    className="group px-8 py-4 bg-[#4C1170] hover:from-violet-500 hover:to-indigo-500 text-white text-lg font-semibold rounded-xl transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 flex items-center gap-3 w-fit"
+                    className="group px-8 py-4 bg-[#4C1170] hover:from-violet-500 text-white text-lg font-semibold rounded-xl transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 flex items-center gap-3 w-fit"
                   >
                     Go to Dashboard
                     <ArrowRight
@@ -105,7 +99,7 @@ export default function Landing() {
             transition={{ duration: 0.8, delay: 0.3 }}
             className="mt-20 relative"
           >
-            <div className="relative max-w-5xl mx-auto rounded-2xl border border-white/10 bg-[#12121a] shadow-2xl shadow-violet-500/10 overflow-hidden">
+            <div className="relative max-w-5xl mx-auto rounded-2xl border border-white/10 bg-[#12121a] shadow-violet-500/10 overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5 bg-[#0d0d12]">
                 <div className="flex gap-2">
                   <div className="w-3 h-3 rounded-full bg-red-500/80" />
@@ -147,7 +141,7 @@ export default function Landing() {
                 </div>
               </div>
 
-              <div className="absolute top-24 right-20 flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500 text-white text-xs font-medium shadow-lg shadow-violet-500/50">
+              <div className="absolute top-24 right-20 flex items-center gap-2 px-3 py-1 rounded-full bg-violet-500 text-white text-xs font-medium shadow-violet-500/50">
                 <div className="w-2 h-2 rounded-full bg-white animate-pulse" />
                 John is typing...
               </div>
@@ -174,27 +168,27 @@ export default function Landing() {
               description="See your teammates' cursors and edits instantly."
             />
             <FeatureCard
-              icon={<Terminal className="text-emerald-400" size={28} />}
+              icon={<Terminal className="text-violet-400" size={28} />}
               title="Integrated Terminal"
               description="Run your code directly in the browser."
             />
             <FeatureCard
-              icon={<Code2 className="text-pink-400" size={28} />}
+              icon={<Code2 className="text-violet-400" size={28} />}
               title="Monaco Editor"
               description="Powered by VS Code editor."
             />
             <FeatureCard
-              icon={<Zap className="text-amber-400" size={28} />}
+              icon={<Zap className="text-violet-400" size={28} />}
               title="Lightning Fast"
               description="Sub-50ms WebSocket sync."
             />
             <FeatureCard
-              icon={<Cpu className="text-cyan-400" size={28} />}
+              icon={<Cpu className="text-violet-400" size={28} />}
               title="Built-in Chat"
               description="Chat without leaving the editor."
             />
             <FeatureCard
-              icon={<Globe className="text-indigo-400" size={28} />}
+              icon={<Globe className="text-violet-400" size={28} />}
               title="Cloud Sync"
               description="Access projects anywhere."
             />
@@ -222,7 +216,7 @@ function FeatureCard({
     <motion.div
       whileHover={{ y: -4, scale: 1.02 }}
       transition={{ duration: 0.2 }}
-      className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl hover:border-violet-500/30 hover:bg-violet-500/[0.03]"
+      className="p-6 bg-white/[0.02] border border-white/5 rounded-2xl hover:border-violet-500"
     >
       <div className="mb-4 p-3 bg-white/5 rounded-xl w-fit">{icon}</div>
       <h3 className="text-xl font-semibold mb-2 text-white">{title}</h3>
