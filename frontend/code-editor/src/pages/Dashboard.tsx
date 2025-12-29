@@ -5,7 +5,6 @@ import {
   Plus,
   LogIn,
   Folder,
-  Hash,
   Clock,
   Users,
   ArrowRight,
@@ -13,7 +12,6 @@ import {
   Copy,
   Check,
 } from "lucide-react";
-import { motion } from "framer-motion";
 import { BACKEND_URL } from "../config";
 
 export default function Dashboard() {

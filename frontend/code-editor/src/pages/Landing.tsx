@@ -8,8 +8,6 @@ import {
   Cpu,
   Globe,
   ArrowRight,
-  Play,
-  Sparkles,
 } from "lucide-react";
 import { getToken } from "../utils/token";
 import Illustration from "../assets/Illustration.svg";
