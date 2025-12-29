@@ -13,7 +13,13 @@ import { Message } from "./models/msgmodels.js";
 import { User } from "./models/usermodels.js";
 const app = express();
 app.use(express.json());
-app.use(cors());
+app.use(cors({
+    origin: ["http://localhost:5173", "https://codeflow.navyasinha.xyz"],
+    credentials: true,
+    methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
+    allowedHeaders: ["Content-Type", "Authorization"],
+}));
+app.options(/.*/, cors());
 const server = createServer(app);
 const wss = new WebSocketServer({ server });
 connectDB();
