@@ -1,4 +1,4 @@
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import { useParams } from "react-router-dom";
 import Editor from "../components/Editor";
 import Chat from "../components/Chat";
@@ -7,7 +7,14 @@ import Terminal from "../components/Terminal";
 import { runCode } from "../api/runcode";
 import { RoomProvider } from "../../liveblocks.config";
 import { getLanguageFromFileName } from "../utils/fileUtils";
-import { Play, MessageSquare, Terminal as TerminalIcon, X } from "lucide-react";
+import {
+  Play,
+  MessageSquare,
+  Terminal as TermIcon,
+  X,
+  Copy,
+  Check,
+} from "lucide-react";
 
 export default function EditorPage() {
   const { roomId } = useParams();
@@ -22,6 +29,15 @@ export default function EditorPage() {
   const [terminalOutput, setTerminalOutput] = useState("");
   const [stdin, setStdin] = useState("");
   const [isRunning, setIsRunning] = useState(false);
+
+  const [fileTreeWidth, setFileTreeWidth] = useState(224);
+  const [terminalHeight, setTerminalHeight] = useState(224);
+  const [isDraggingFileTree, setIsDraggingFileTree] = useState(false);
+  const [isDraggingTerminal, setIsDraggingTerminal] = useState(false);
+  const [copied, setCopied] = useState(false);
+
+  const fileTreeRef = useRef<HTMLDivElement>(null);
+  const terminalRef = useRef<HTMLDivElement>(null);
 
   if (!roomId) return null;
 
@@ -57,19 +73,78 @@ export default function EditorPage() {
     }
   };
 
+  const handleFileTreeMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDraggingFileTree(true);
+  };
+
+  const handleTerminalMouseDown = (e: React.MouseEvent) => {
+    e.preventDefault();
+    setIsDraggingTerminal(true);
+  };
+
+  const handleMouseMove = (e: MouseEvent) => {
+    if (isDraggingFileTree) {
+      const newWidth = e.clientX;
+      if (newWidth >= 150 && newWidth <= 500) {
+        setFileTreeWidth(newWidth);
+      }
+    }
+    if (isDraggingTerminal) {
+      const newHeight = window.innerHeight - e.clientY - 48;
+      if (newHeight >= 100 && newHeight <= 600) {
+        setTerminalHeight(newHeight);
+      }
+    }
+  };
+
+  const handleMouseUp = () => {
+    setIsDraggingFileTree(false);
+    setIsDraggingTerminal(false);
+  };
+
+  const handleCopyRoomId = async () => {
+    try {
+      await navigator.clipboard.writeText(roomId);
+      setCopied(true);
+      setTimeout(() => setCopied(false), 2000);
+    } catch (err) {
+      console.error("Failed to copy:", err);
+    }
+  };
+
+  useEffect(() => {
+    if (isDraggingFileTree || isDraggingTerminal) {
+      window.addEventListener("mousemove", handleMouseMove);
+      window.addEventListener("mouseup", handleMouseUp);
+      return () => {
+        window.removeEventListener("mousemove", handleMouseMove);
+        window.removeEventListener("mouseup", handleMouseUp);
+      };
+    }
+  }, [isDraggingFileTree, isDraggingTerminal]);
+
   return (
     <RoomProvider id={roomId} initialPresence={{ cursor: null }}>
       <div className="flex h-[calc(100vh-48px)] bg-[#1e1e1e]">
-        <div className="w-56 bg-[#252526] border-r border-[#3e3e42]">
+        <div
+          ref={fileTreeRef}
+          style={{ width: `${fileTreeWidth}px` }}
+          className="bg-[#252526] border-r border-[#3e3e42] relative"
+        >
           <FileTree
             activeFileId={activeFile?._id}
             onSelectFile={setActiveFile}
+          />
+          <div
+            onMouseDown={handleFileTreeMouseDown}
+            className="absolute top-0 right-0 w-1 h-full cursor-col-resize hover:bg-[#9510C9] transition-colors"
           />
         </div>
 
         <div className="flex-1 flex flex-col min-w-0">
           <div className="h-9 bg-[#252526] border-b border-[#3e3e42] flex items-center justify-between px-3">
-            <div className="flex items-center gap-1">
+            <div className="flex items-center gap-2">
               {activeFile && (
                 <div className="flex items-center gap-2 px-2 py-1 text-sm text-[#cccccc] bg-[#1e1e1e]">
                   <span className="text-xs">{activeFile.name}</span>
@@ -81,6 +156,16 @@ export default function EditorPage() {
                   </button>
                 </div>
               )}
+              <button
+                onClick={handleCopyRoomId}
+                className="flex items-center gap-1.5 px-2 py-1 text-xs hover:bg-[#2a2d2e] text-[#cccccc] rounded-sm"
+                title="Copy Room ID"
+              >
+                {copied ? <Check size={12} /> : <Copy size={12} />}
+                <span className="text-xs">
+                  {copied ? "Copied!" : "Copy Room ID"}
+                </span>
+              </button>
             </div>
 
             <div className="flex items-center gap-1">
@@ -101,7 +186,7 @@ export default function EditorPage() {
                     : "text-[#858585] hover:bg-[#2a2d2e]"
                 }`}
               >
-                <TerminalIcon size={14} />
+                <TermIcon size={14} />
               </button>
 
               <button
@@ -128,7 +213,15 @@ export default function EditorPage() {
           </div>
 
           {showTerminal && (
-            <div className="h-56 bg-[#1e1e1e] border-t border-[#3e3e42] flex flex-col">
+            <div
+              ref={terminalRef}
+              style={{ height: `${terminalHeight}px` }}
+              className="bg-[#1e1e1e] border-t border-[#3e3e42] flex flex-col relative"
+            >
+              <div
+                onMouseDown={handleTerminalMouseDown}
+                className="absolute top-0 left-0 right-0 h-1 cursor-row-resize hover:bg-[#9510C9] transition-colors z-10"
+              />
               <div className="flex items-center justify-between h-9 px-3 bg-[#252526]">
                 <span className="text-xs text-[#cccccc]">Terminal</span>
                 <button

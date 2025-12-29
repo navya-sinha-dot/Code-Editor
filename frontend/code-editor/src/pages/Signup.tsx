@@ -47,14 +47,12 @@ export default function Signup() {
 
   return (
     <div className="min-h-screen flex items-center justify-center bg-[#0a0a0f] px-4 pt-16">
-      {/* Background effects */}
       <div className="fixed inset-0 z-0">
         <div className="absolute top-1/3 right-1/3 w-[400px] h-[400px] bg-violet-600/10 rounded-full blur-[100px]" />
         <div className="absolute bottom-1/3 left-1/3 w-[300px] h-[300px] bg-indigo-600/10 rounded-full blur-[100px]" />
       </div>
 
       <div className="relative z-10 w-full max-w-md">
-        {/* Logo */}
         <div className="text-center mb-8">
           <Link
             to="/"

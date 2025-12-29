@@ -1,4 +1,4 @@
-import { BrowserRouter, Routes, Route } from "react-router-dom";
+import { BrowserRouter, Routes, Route, useLocation } from "react-router-dom";
 import Landing from "./pages/Landing";
 import Login from "./pages/Login";
 import Signup from "./pages/Signup";
@@ -6,10 +6,16 @@ import Dashboard from "./pages/Dashboard";
 import EditorPage from "./pages/EditorPage";
 import Navbar from "./components/Navbar";
 
-export default function App() {
+function AppRoutes() {
+  const location = useLocation();
+
+  const hideNavbar =
+    location.pathname === "/login" || location.pathname === "/signup";
+
   return (
-    <BrowserRouter>
-      <Navbar />
+    <>
+      {!hideNavbar && <Navbar />}
+
       <Routes>
         <Route path="/" element={<Landing />} />
         <Route path="/login" element={<Login />} />
@@ -17,6 +23,14 @@ export default function App() {
         <Route path="/dashboard" element={<Dashboard />} />
         <Route path="/editor/:roomId" element={<EditorPage />} />
       </Routes>
+    </>
+  );
+}
+
+export default function App() {
+  return (
+    <BrowserRouter>
+      <AppRoutes />
     </BrowserRouter>
   );
 }
