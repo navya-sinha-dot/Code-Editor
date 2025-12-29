@@ -24,7 +24,7 @@ app.use(
   })
 );
 
-app.options("*", cors());
+app.options(/.*/, cors());
 
 const server = createServer(app);
 const wss = new WebSocketServer({ server });
