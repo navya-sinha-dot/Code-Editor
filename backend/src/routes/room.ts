@@ -168,4 +168,112 @@ router.delete(
   }
 );
 
+router.get(
+  "/:roomId/participants",
+  authMiddleware,
+  async (req: AuthRequest, res: Response) => {
+    try {
+      const { roomId } = req.params;
+      if (!roomId) {
+        return res.json({
+          message: "Roomid is required",
+        });
+      }
+
+      if (!req.userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      if (!mongoose.Types.ObjectId.isValid(roomId)) {
+        return res.status(400).json({ message: "Invalid room ID" });
+      }
+
+      const room = await Room.findById(roomId)
+        .populate("members.userId", "name")
+        .select("members");
+
+      if (!room) {
+        return res.status(404).json({ message: "Room not found" });
+      }
+
+      const participants = room.members.map((m) => ({
+        userId: (m.userId as any)._id.toString(),
+        name: (m.userId as any).name,
+        role: m.role,
+      }));
+
+      return res.json({ participants });
+    } catch (err) {
+      return res.status(500).json({ message: "Failed to fetch participants" });
+    }
+  }
+);
+
+router.post(
+  "/:roomId/remove/:userId",
+  authMiddleware,
+  async (req: AuthRequest, res: Response) => {
+    try {
+      const { roomId, userId } = req.params;
+
+      if (!roomId || !userId) {
+        return res.json({
+          message: "roomid and userid is required",
+        });
+      }
+
+      if (!req.userId) {
+        return res.status(401).json({ message: "Unauthorized" });
+      }
+
+      if (
+        !mongoose.Types.ObjectId.isValid(roomId) ||
+        !mongoose.Types.ObjectId.isValid(userId)
+      ) {
+        return res.status(400).json({ message: "Invalid ID" });
+      }
+
+      const room = await Room.findById(roomId);
+      if (!room) {
+        return res.status(404).json({ message: "Room not found" });
+      }
+
+      const requester = room.members.find(
+        (m) => m.userId.toString() === req.userId
+      );
+
+      if (!requester || requester.role !== "OWNER") {
+        return res.status(403).json({ message: "Only owner can remove users" });
+      }
+
+      if (req.userId === userId) {
+        return res
+          .status(400)
+          .json({ message: "Owner cannot remove themselves" });
+      }
+
+      room.members = room.members.filter((m) => m.userId.toString() !== userId);
+
+      await room.save();
+
+      const updatedRoom = await Room.findById(roomId)
+        .populate("members.userId", "name")
+        .select("members");
+
+      const participants = updatedRoom!.members.map((m) => ({
+        userId: (m.userId as any)._id.toString(),
+        name: (m.userId as any).name,
+        role: m.role,
+      }));
+
+      return res.json({
+        message: "User removed successfully",
+        participants,
+      });
+    } catch (err) {
+      return res.status(500).json({ message: "Failed to remove user" });
+    }
+  }
+);
+
 export default router;
