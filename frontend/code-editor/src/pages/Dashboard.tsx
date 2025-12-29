@@ -92,7 +92,6 @@ export default function Dashboard() {
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-slate-100 pt-20">
       <div className="max-w-6xl mx-auto px-6 py-10">
-        {/* Header */}
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-2">
             <Sparkles className="text-violet-400" size={22} />
@@ -103,9 +102,7 @@ export default function Dashboard() {
           </p>
         </div>
 
-        {/* Create / Join */}
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-          {/* Create */}
           <div className="rounded-xl bg-[#12121a] border border-white/5 p-6">
             <h2 className="text-sm font-medium text-slate-300 mb-4 flex items-center gap-2">
               <Plus size={16} className="text-violet-400" />
@@ -129,7 +126,6 @@ export default function Dashboard() {
             </div>
           </div>
 
-          {/* Join */}
           <div className="rounded-xl bg-[#12121a] border border-white/5 p-6">
             <h2 className="text-sm font-medium text-slate-300 mb-4 flex items-center gap-2">
               <LogIn size={16} className="text-violet-400" />
@@ -154,7 +150,6 @@ export default function Dashboard() {
           </div>
         </div>
 
-        {/* Projects */}
         <div>
           <h2 className="text-md font-medium text-slate-400 mb-4 flex items-center gap-2">
             <Folder size={16} className="text-violet-400" />

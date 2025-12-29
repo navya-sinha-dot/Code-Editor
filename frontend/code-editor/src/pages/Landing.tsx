@@ -91,7 +91,6 @@ export default function Landing() {
               transition={{ duration: 0.8, delay: 0.2 }}
               className="flex justify-center"
             >
-              {/* PUT YOUR ILLUSTRATION HERE */}
               <div className="w-full max-w-md h-[360px]  flex items-center justify-center text-slate-400">
                 <img
                   src={Illustration}
