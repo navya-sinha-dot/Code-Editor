@@ -14,6 +14,7 @@ import {
   Check,
 } from "lucide-react";
 import { motion } from "framer-motion";
+import { BACKEND_URL } from "../config";
 
 export default function Dashboard() {
   const [rooms, setRooms] = useState<any[]>([]);
@@ -25,7 +26,7 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
-    fetch("http://localhost:3000/api/rooms", {
+    fetch(`${BACKEND_URL}/api/rooms`, {
       headers: {
         Authorization: `Bearer ${getToken()}`,
       },
@@ -41,7 +42,7 @@ export default function Dashboard() {
   const createRoom = async () => {
     if (!newRoomName.trim()) return;
 
-    const res = await fetch("http://localhost:3000/api/rooms", {
+    const res = await fetch(`${BACKEND_URL}/api/rooms`, {
       method: "POST",
       headers: {
         "Content-Type": "application/json",
@@ -64,15 +65,12 @@ export default function Dashboard() {
   const joinRoom = async () => {
     if (!joinRoomId) return;
 
-    const res = await fetch(
-      `http://localhost:3000/api/rooms/${joinRoomId}/join`,
-      {
-        method: "POST",
-        headers: {
-          Authorization: `Bearer ${getToken()}`,
-        },
-      }
-    );
+    const res = await fetch(`${BACKEND_URL}/api/rooms/${joinRoomId}/join`, {
+      method: "POST",
+      headers: {
+        Authorization: `Bearer ${getToken()}`,
+      },
+    });
 
     if (!res.ok) {
       alert("Failed to join room");

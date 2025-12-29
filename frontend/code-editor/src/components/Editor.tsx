@@ -8,6 +8,7 @@ import axios from "axios";
 import * as monaco from "monaco-editor";
 import { getToken } from "../utils/token";
 import { getLanguageFromFileName } from "../utils/fileUtils";
+import { BACKEND_URL } from "../config";
 
 interface EditorProps {
   fileName: string;
@@ -52,7 +53,7 @@ export default function Editor({ fileName }: EditorProps) {
 
       try {
         const res = await axios.get(
-          `http://localhost:3000/api/files/${roomId}/file/${fileName}`,
+          `${BACKEND_URL}/api/files/${roomId}/file/${fileName}`,
           {
             headers: { Authorization: `Bearer ${token}` },
           }
@@ -109,7 +110,7 @@ export default function Editor({ fileName }: EditorProps) {
 
     const interval = setInterval(() => {
       axios.post(
-        `http://localhost:3000/api/files/${roomId}/file/${fileName}`,
+        `${BACKEND_URL}/api/files/${roomId}/file/${fileName}`,
         {
           content: editorRef.getValue(),
           language: fileLanguage,

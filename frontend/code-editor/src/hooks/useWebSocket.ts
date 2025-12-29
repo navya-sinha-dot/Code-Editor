@@ -1,37 +1,37 @@
 import { useEffect, useRef, useState } from "react";
 import { getToken } from "../utils/token";
+import { WS_BACKEND_URL } from "../config";
 
 export const useWebSocket = (onMessage: (data: any) => void) => {
   const wsRef = useRef<WebSocket | null>(null);
   const handlerRef = useRef(onMessage);
   const [isReady, setIsReady] = useState(false);
 
-  // Always keep latest handler without re-creating socket
   handlerRef.current = onMessage;
 
   useEffect(() => {
     const token = getToken();
     if (!token) return;
 
-    const ws = new WebSocket(`ws://localhost:3000?token=${token}`);
+    const ws = new WebSocket(`${WS_BACKEND_URL}?token=${token}`);
 
     ws.onopen = () => {
-      console.log("✅ WebSocket connected");
+      console.log("WebSocket connected");
       setIsReady(true);
     };
 
     ws.onmessage = (e) => {
       const data = JSON.parse(e.data);
-      handlerRef.current(data); // 👈 stable handler
+      handlerRef.current(data);
     };
 
     ws.onclose = () => {
-      console.log("❌ WebSocket disconnected");
+      console.log("WebSocket disconnected");
       setIsReady(false);
     };
 
     ws.onerror = () => {
-      console.log("❌ WebSocket error");
+      console.log("WebSocket error");
     };
 
     wsRef.current = ws;
@@ -39,7 +39,7 @@ export const useWebSocket = (onMessage: (data: any) => void) => {
     return () => {
       ws.close();
     };
-  }, []); // 👈 EMPTY dependency array (CRITICAL)
+  }, []);
 
   const send = (data: any) => {
     if (!wsRef.current) return;

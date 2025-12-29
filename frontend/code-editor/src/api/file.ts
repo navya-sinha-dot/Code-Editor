@@ -1,7 +1,8 @@
 import axios from "axios";
 import { getToken } from "../utils/token";
+import { BACKEND_URL } from "../config";
 
-const API = "http://localhost:3000/api/files";
+const API = `${BACKEND_URL}/api/files`;
 
 export const fetchFiles = (roomId: string) =>
   axios.get(`${API}/${roomId}`, {

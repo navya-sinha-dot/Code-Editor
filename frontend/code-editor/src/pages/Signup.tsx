@@ -2,6 +2,7 @@ import { useState } from "react";
 import { useNavigate, Link } from "react-router-dom";
 import { setToken } from "../utils/token";
 import { UserPlus, Mail, Lock, User, ArrowRight, Code2 } from "lucide-react";
+import { BACKEND_URL } from "../config";
 
 export default function Signup() {
   const [name, setName] = useState("");
@@ -22,7 +23,7 @@ export default function Signup() {
     setError("");
 
     try {
-      const res = await fetch("http://localhost:3000/api/auth/signup", {
+      const res = await fetch(`${BACKEND_URL}/api/auth/signup`, {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ name, email, password }),
