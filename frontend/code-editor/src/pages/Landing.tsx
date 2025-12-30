@@ -1,110 +1,81 @@
 import { Link } from "react-router-dom";
 import { motion } from "framer-motion";
-import {
-  Code2,
-  Zap,
-  Users,
-  Terminal,
-  Cpu,
-  Globe,
-  ArrowRight,
-} from "lucide-react";
+import { Code2, Zap, Users, Terminal, Cpu, Globe } from "lucide-react";
 import { getToken } from "../utils/token";
-import Illustration from "../assets/Illustration.svg";
+import { Component as EtheralShadow } from "../components/eternal-shadows";
 
 export default function Landing() {
   const isLoggedIn = !!getToken();
 
   return (
     <div className="min-h-screen bg-[#0a0a0f] text-white selection:text-white overflow-hidden">
-      <div className="relative z-10 pt-32 pb-20 sm:pt-30 sm:pb-32">
+      <div className="relative w-full h-screen overflow-hidden">
+        <div className="absolute inset-0 z-0">
+          <EtheralShadow
+            color="rgba(140, 90, 255, 1)"
+            animation={{ scale: 100, speed: 90 }}
+            noise={{ opacity: 1, scale: 1.2 }}
+            sizing="fill"
+          />
+        </div>
+
+        <div className="absolute inset-0 bg-black/30 z-[1]" />
+
+        <div className="relative z-10 h-full flex flex-col items-center justify-center text-center px-6">
+          <motion.h1
+            initial={{ opacity: 0, y: 30 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8 }}
+            className="text-6xl md:text-7xl lg:text-8xl font-black mb-6"
+          >
+            <span className="bg-gray-300 text-transparent bg-clip-text">
+              Code Flow
+            </span>
+          </motion.h1>
+
+          <motion.p
+            initial={{ opacity: 0, y: 20 }}
+            animate={{ opacity: 1, y: 0 }}
+            transition={{ duration: 0.8, delay: 0.1 }}
+            className="max-w-2xl text-lg md:text-xl text-slate-300 leading-relaxed mb-10"
+          >
+            A next-generation collaborative code editor. Experience seamless
+            pair programming with real-time sync, built-in terminal, and instant
+            chat.
+          </motion.p>
+
+          {isLoggedIn ? (
+            <Link
+              to="/dashboard"
+              className="px-8 py-4 bg-[#4C1170] text-white text-lg font-semibold rounded-xl shadow-lg hover:scale-105 transition"
+            >
+              Go to Dashboard →
+            </Link>
+          ) : (
+            <Link
+              to="/signup"
+              className="px-8 py-4 bg-[#4C1170] text-white text-lg font-semibold rounded-xl shadow-lg hover:scale-105 transition"
+            >
+              Start Coding Free →
+            </Link>
+          )}
+        </div>
+      </div>
+
+      <div className="relative z-10 pt-32 pb-20">
         <div className="max-w-7xl mx-auto px-6">
-          <div className="grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8 }}
-              className="text-left"
-            >
-              <h1 className="text-7xl font-black mb-8">
-                <span className="bg-white text-transparent bg-clip-text">
-                  Code Together.
-                </span>
-                <br />
-                <span className="bg-white text-transparent bg-clip-text">
-                  Build Faster.
-                </span>
-              </h1>
-
-              <p className="text-lg sm:text-xl text-slate-400 mb-12 max-w-2xl leading-relaxed">
-                A next-generation collaborative code editor. Experience seamless
-                pair programming with real-time sync, built-in terminal, and
-                instant chat.
-              </p>
-
-              <div className="flex flex-col sm:flex-row gap-4">
-                {isLoggedIn ? (
-                  <Link
-                    to="/dashboard"
-                    className="group px-8 py-4 bg-[#4C1170] hover:from-violet-500 text-white text-lg font-semibold rounded-xl transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 flex items-center gap-3 w-fit"
-                  >
-                    Go to Dashboard
-                    <ArrowRight
-                      size={20}
-                      className="group-hover:translate-x-1 transition-transform"
-                    />
-                  </Link>
-                ) : (
-                  <>
-                    <Link
-                      to="/signup"
-                      className="group px-8 py-4 bg-[#4C1170] hover:from-violet-500 hover:to-indigo-500 text-white text-lg font-semibold rounded-xl transition-all shadow-lg shadow-violet-500/25 hover:shadow-violet-500/40 flex items-center gap-3 w-fit"
-                    >
-                      Start Coding Free
-                      <ArrowRight
-                        size={20}
-                        className="group-hover:translate-x-1 transition-transform"
-                      />
-                    </Link>
-                    <Link
-                      to="/login"
-                      className="px-8 py-4 bg-white/5 hover:bg-white/10 text-white text-lg font-semibold rounded-xl border border-white/10 hover:border-white/20 transition-all flex items-center gap-3 w-fit"
-                    >
-                      Sign In
-                    </Link>
-                  </>
-                )}
-              </div>
-            </motion.div>
-
-            <motion.div
-              initial={{ opacity: 0, y: 30 }}
-              animate={{ opacity: 1, y: 0 }}
-              transition={{ duration: 0.8, delay: 0.2 }}
-              className="flex justify-center"
-            >
-              <div className="w-full max-w-md h-[360px]  flex items-center justify-center text-slate-400">
-                <img
-                  src={Illustration}
-                  alt="Illustration"
-                  className="w-86 md:w-[900px] object-contain transform transition duration-500 hover:scale-105"
-                />
-              </div>
-            </motion.div>
-          </div>
-
           <motion.div
             initial={{ opacity: 0, y: 50 }}
             animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.8, delay: 0.3 }}
-            className="mt-20 relative"
+            transition={{ duration: 0.8 }}
+            className="relative"
           >
             <div className="relative max-w-5xl mx-auto rounded-2xl border border-white/10 bg-[#12121a] shadow-violet-500/10 overflow-hidden">
               <div className="flex items-center gap-2 px-4 py-3 border-b border-white/5 bg-[#0d0d12]">
                 <div className="flex gap-2">
-                  <div className="w-3 h-3 rounded-full bg-red-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-yellow-500/80" />
-                  <div className="w-3 h-3 rounded-full bg-green-500/80" />
+                  <div className="w-3 h-3 rounded-full bg-red-700/80" />
+                  <div className="w-3 h-3 rounded-full bg-yellow-700/80" />
+                  <div className="w-3 h-3 rounded-full bg-green-700/80" />
                 </div>
                 <div className="flex-1 text-center text-sm text-slate-500 font-mono">
                   main.ts
@@ -117,26 +88,26 @@ export default function Landing() {
                     1<br />2<br />3<br />4<br />5<br />6<br />7
                   </div>
                   <div>
-                    <span className="text-purple-400">const</span>{" "}
-                    <span className="text-blue-400">greeting</span> ={" "}
-                    <span className="text-amber-300">"Hello, World!"</span>;
+                    <span className="text-purple-800">const</span>{" "}
+                    <span className="text-blue-600">greeting</span> ={" "}
+                    <span className="text-amber-600">"Hello, World!"</span>;
                     <br />
-                    <span className="text-purple-400">function</span>{" "}
-                    <span className="text-yellow-400">main</span>() {"{"}
-                    <br />
-                    {"  "}
-                    <span className="text-blue-400">console</span>.
-                    <span className="text-yellow-400">log</span>(
-                    <span className="text-blue-400">greeting</span>);
+                    <span className="text-purple-600">function</span>{" "}
+                    <span className="text-yellow-600">main</span>() {"{"}
                     <br />
                     {"  "}
-                    <span className="text-purple-400">return</span>{" "}
-                    <span className="text-orange-400">0</span>;
+                    <span className="text-blue-600">console</span>.
+                    <span className="text-yellow-600">log</span>(
+                    <span className="text-blue-600">greeting</span>);
+                    <br />
+                    {"  "}
+                    <span className="text-purple-600">return</span>{" "}
+                    <span className="text-orange-600">0</span>;
                     <br />
                     {"}"}
                     <br />
                     <br />
-                    <span className="text-yellow-400">main</span>();
+                    <span className="text-yellow-600">main</span>();
                   </div>
                 </div>
               </div>
@@ -154,7 +125,7 @@ export default function Landing() {
         <div className="max-w-7xl mx-auto px-6">
           <div className="text-center mb-16">
             <h2 className="text-4xl sm:text-5xl font-bold mb-6">
-              Built for <span className="text-violet-400">developers</span>
+              Built for <span className="text-violet-600">developers</span>
             </h2>
             <p className="text-slate-400 max-w-2xl mx-auto text-lg">
               Everything you need to collaborate on code in real-time.

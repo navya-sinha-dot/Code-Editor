@@ -13,6 +13,7 @@ import {
   Check,
 } from "lucide-react";
 import { BACKEND_URL } from "../config";
+import { Component as EtheralShadow } from "../components/eternal-shadows";
 
 export default function Dashboard() {
   const [rooms, setRooms] = useState<any[]>([]);
@@ -86,7 +87,18 @@ export default function Dashboard() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0a0f] text-slate-100 pt-20">
+    <div className="relative min-h-screen text-slate-100 pt-20 overflow-hidden">
+      <div className="fixed inset-0 -z-10">
+        <EtheralShadow
+          color="rgba(120, 80, 200, 1)"
+          animation={{ scale: 40, speed: 30 }}
+          noise={{ opacity: 0.3, scale: 1 }}
+          sizing="fill"
+        />
+
+        <div className="absolute inset-0 bg-[#0a0a0f]/65" />
+      </div>
+
       <div className="max-w-6xl mx-auto px-6 py-10">
         <div className="mb-10">
           <div className="flex items-center gap-3 mb-2">
@@ -99,7 +111,7 @@ export default function Dashboard() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-          <div className="rounded-xl bg-[#12121a] border border-white/5 p-6">
+          <div className="rounded-xl bg-[#12121a]/90 border border-white/5 p-6 backdrop-blur">
             <h2 className="text-sm font-medium text-slate-300 mb-4 flex items-center gap-2">
               <Plus size={16} className="text-violet-400" />
               New Project
@@ -122,7 +134,7 @@ export default function Dashboard() {
             </div>
           </div>
 
-          <div className="rounded-xl bg-[#12121a] border border-white/5 p-6">
+          <div className="rounded-xl bg-[#12121a]/90 border border-white/5 p-6 backdrop-blur">
             <h2 className="text-sm font-medium text-slate-300 mb-4 flex items-center gap-2">
               <LogIn size={16} className="text-violet-400" />
               Join Session
@@ -168,7 +180,7 @@ export default function Dashboard() {
                 <div
                   key={room._id}
                   onClick={() => navigate(`/editor/${room._id}`)}
-                  className="group cursor-pointer rounded-xl bg-[#12121a] border border-white/5 p-5 hover:border-violet-500/30 transition"
+                  className="group cursor-pointer rounded-xl bg-[#12121a]/90 border border-white/5 p-5 hover:border-violet-500/30 transition backdrop-blur"
                 >
                   <div className="flex items-center justify-between mb-3">
                     <button
