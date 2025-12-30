@@ -32,9 +32,7 @@ export default function Dashboard() {
 
   useEffect(() => {
     fetch(`${BACKEND_URL}/api/rooms`, {
-      headers: {
-        Authorization: `Bearer ${getToken()}`,
-      },
+      headers: { Authorization: `Bearer ${getToken()}` },
     })
       .then((res) => res.json())
       .then((data) => {
@@ -77,26 +75,22 @@ export default function Dashboard() {
   };
 
   const confirmLeave = async () => {
-    const roomId = leaveModal._id;
-
-    await fetch(`${BACKEND_URL}/api/rooms/${roomId}/leave`, {
+    await fetch(`${BACKEND_URL}/api/rooms/${leaveModal._id}/leave`, {
       method: "POST",
       headers: { Authorization: `Bearer ${getToken()}` },
     });
 
-    setRooms((prev) => prev.filter((r) => r._id !== roomId));
+    setRooms((prev) => prev.filter((r) => r._id !== leaveModal._id));
     setLeaveModal(null);
   };
 
   const confirmDelete = async () => {
-    const roomId = deleteModal._id;
-
-    await fetch(`${BACKEND_URL}/api/rooms/${roomId}`, {
+    await fetch(`${BACKEND_URL}/api/rooms/${deleteModal._id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${getToken()}` },
     });
 
-    setRooms((prev) => prev.filter((r) => r._id !== roomId));
+    setRooms((prev) => prev.filter((r) => r._id !== deleteModal._id));
     setDeleteModal(null);
   };
 
@@ -179,94 +173,109 @@ export default function Dashboard() {
             <Folder size={16} /> Your Projects
           </h2>
 
-          <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
-            {rooms.map((room) => (
-              <div
-                key={room._id}
-                onClick={() => navigate(`/editor/${room._id}`)}
-                className=" rounded-xl bg-[#12121a]/90 p-5 cursor-default"
-              >
-                <div className="flex justify-between mb-3">
-                  <button
-                    onClick={(e) => copyRoomId(room._id, e)}
-                    className="text-xs font-mono text-slate-500 flex gap-1 cursor-pointer"
-                  >
-                    {copiedId === room._id ? (
-                      <>
-                        <Check size={12} /> Copied
-                      </>
-                    ) : (
-                      <>
-                        <Copy size={12} /> {room._id.slice(-6)}
-                      </>
-                    )}
-                  </button>
+          {loading ? (
+            <div className="py-12 text-center text-slate-500 text-sm">
+              Loading projects…
+            </div>
+          ) : (
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {rooms.length === 0 && (
+                <div className="col-span-full py-14 text-center border border-dashed border-white/10 rounded-xl text-slate-500 text-sm">
+                  No projects yet
+                </div>
+              )}
 
-                  <div className="flex gap-2">
+              {rooms.map((room) => (
+                <div
+                  key={room._id}
+                  onClick={() => navigate(`/editor/${room._id}`)}
+                  className="cursor-default rounded-xl bg-[#12121a]/90 p-5"
+                >
+                  <div className="flex justify-between mb-3">
                     <button
-                      onClick={(e) => {
-                        e.stopPropagation();
-                        setLeaveModal(room);
-                      }}
-                      className="cursor-pointer"
+                      onClick={(e) => copyRoomId(room._id, e)}
+                      className="text-xs font-mono text-slate-500 flex gap-1 cursor-pointer"
                     >
-                      <LogOut size={14} />
+                      {copiedId === room._id ? (
+                        <>
+                          <Check size={12} /> Copied
+                        </>
+                      ) : (
+                        <>
+                          <Copy size={12} /> {room._id.slice(-6)}
+                        </>
+                      )}
                     </button>
 
-                    {room.role === "OWNER" && (
+                    <div className="flex gap-2">
                       <button
                         onClick={(e) => {
                           e.stopPropagation();
-                          setDeleteModal(room);
+                          setLeaveModal(room);
                         }}
                         className="cursor-pointer"
                       >
-                        <Trash2 size={14} />
+                        <LogOut size={14} />
                       </button>
-                    )}
+
+                      {room.role === "OWNER" && (
+                        <button
+                          onClick={(e) => {
+                            e.stopPropagation();
+                            setDeleteModal(room);
+                          }}
+                          className="cursor-pointer"
+                        >
+                          <Trash2 size={14} />
+                        </button>
+                      )}
+                    </div>
+                  </div>
+
+                  <h3 className="text-slate-200 font-medium">
+                    {room.name || "Untitled Project"}
+                  </h3>
+
+                  <div className="text-xs text-slate-600 flex items-center gap-1 mt-1">
+                    <Clock size={12} /> Recently updated
                   </div>
                 </div>
-
-                <h3 className="text-slate-200 font-medium">{room.name}</h3>
-                <div className="text-xs text-slate-600 flex items-center gap-1 mt-1">
-                  <Clock size={12} /> Recently updated
-                </div>
-              </div>
-            ))}
-          </div>
+              ))}
+            </div>
+          )}
         </div>
       </div>
 
       {leaveModal && (
-        <Modal
+        <ConfirmModal
           title="Leave Room"
-          description={`Leave "${leaveModal.name}"?`}
+          text={`Leave "${leaveModal.name}"?`}
+          confirmText="Leave"
           onCancel={() => setLeaveModal(null)}
           onConfirm={confirmLeave}
-          confirmText="Leave"
         />
       )}
 
       {deleteModal && (
-        <Modal
+        <ConfirmModal
           title="Delete Room"
-          description={`Delete "${deleteModal.name}" permanently?`}
-          onCancel={() => setDeleteModal(null)}
-          onConfirm={confirmDelete}
+          text={`Delete "${deleteModal.name}" permanently?`}
           confirmText="Delete"
           danger
+          onCancel={() => setDeleteModal(null)}
+          onConfirm={confirmDelete}
         />
       )}
     </>
   );
 }
 
-function Modal({
+function ConfirmModal({
   title,
-  description,
+  text,
+  confirmText,
   onCancel,
   onConfirm,
-  confirmText,
   danger,
 }: any) {
   return (
@@ -279,7 +288,7 @@ function Modal({
             <X size={16} />
           </button>
         </div>
-        <div className="px-4 pb-2 text-sm text-[#cccccc]">{description}</div>
+        <div className="px-4 pb-2 text-sm text-[#cccccc]">{text}</div>
         <div className="flex justify-end gap-2 p-4 border-t border-[#3e3e42]">
           <button
             onClick={onCancel}
@@ -289,9 +298,9 @@ function Modal({
           </button>
           <button
             onClick={onConfirm}
-            className={`px-3 py-1.5 text-xs rounded-sm cursor-pointer ${
+            className={`px-3 py-1.5 text-xs rounded-sm text-white cursor-pointer ${
               danger ? "bg-[#480663]" : "bg-[#480663]"
-            } text-white`}
+            }`}
           >
             {confirmText}
           </button>
