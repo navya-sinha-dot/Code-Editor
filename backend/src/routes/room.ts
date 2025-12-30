@@ -98,9 +98,22 @@ router.get("/", authMiddleware, async (req: AuthRequest, res: Response) => {
 
     const rooms = await Room.find({
       "members.userId": new mongoose.Types.ObjectId(req.userId),
-    }).select("_id name createdAt");
+    });
 
-    res.json(rooms);
+    const response = rooms.map((room) => {
+      const member = room.members.find(
+        (m) => m.userId.toString() === req.userId
+      );
+
+      return {
+        _id: room._id,
+        name: room.name,
+        createdAt: room.createdAt,
+        role: member?.role,
+      };
+    });
+
+    res.json(response);
   } catch (err) {
     res.status(500).json({ message: "Failed to fetch rooms" });
   }
