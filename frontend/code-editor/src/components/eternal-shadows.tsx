@@ -1,10 +1,11 @@
 "use client";
 
-import React, { useRef, useId, useEffect } from "react";
+import { useRef, useId, useEffect } from "react";
 import type { CSSProperties } from "react";
 import { animate, useMotionValue } from "framer-motion";
 
 import type { AnimationPlaybackControls } from "framer-motion";
+
 interface ResponsiveImage {
   src: string;
   alt?: string;
