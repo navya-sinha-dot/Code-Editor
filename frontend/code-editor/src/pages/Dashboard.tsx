@@ -31,16 +31,37 @@ export default function Dashboard() {
   const navigate = useNavigate();
 
   useEffect(() => {
+    const token = getToken();
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
     fetch(`${BACKEND_URL}/api/rooms`, {
-      headers: { Authorization: `Bearer ${getToken()}` },
+      headers: { Authorization: `Bearer ${token}` },
     })
-      .then((res) => res.json())
+      .then(async (res) => {
+        if (res.status === 401) {
+          localStorage.removeItem("auth_token");
+          navigate("/login");
+          return;
+        }
+        if (!res.ok) throw new Error("Failed to fetch rooms");
+        return res.json();
+      })
       .then((data) => {
-        setRooms(data);
+        if (Array.isArray(data)) {
+          setRooms(data);
+        } else {
+          setRooms([]);
+        }
         setLoading(false);
       })
-      .catch(() => setLoading(false));
-  }, []);
+      .catch((err) => {
+        console.error("Fetch error:", err);
+        setLoading(false);
+      });
+  }, [navigate]);
 
   const createRoom = async () => {
     if (!newRoomName.trim()) return;
@@ -298,9 +319,8 @@ function ConfirmModal({
           </button>
           <button
             onClick={onConfirm}
-            className={`px-3 py-1.5 text-xs rounded-sm text-white cursor-pointer ${
-              danger ? "bg-[#480663]" : "bg-[#480663]"
-            }`}
+            className={`px-3 py-1.5 text-xs rounded-sm text-white cursor-pointer ${danger ? "bg-[#480663]" : "bg-[#480663]"
+              }`}
           >
             {confirmText}
           </button>
