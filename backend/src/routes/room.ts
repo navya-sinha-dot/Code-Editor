@@ -18,7 +18,7 @@ router.post("/", authMiddleware, async (req: AuthRequest, res: Response) => {
     }
 
     if (!req.userId) {
-      return res.json({
+      return res.status(401).json({
         message: "Unauthorized",
       });
     }
@@ -37,7 +37,7 @@ router.post("/", authMiddleware, async (req: AuthRequest, res: Response) => {
 
     res.json(room);
   } catch (err) {
-    res.json({
+    res.status(500).json({
       message: "Room creation Failed",
     });
   }
@@ -188,7 +188,7 @@ router.get(
     try {
       const { roomId } = req.params;
       if (!roomId) {
-        return res.json({
+        return res.status(400).json({
           message: "Roomid is required",
         });
       }
@@ -230,7 +230,7 @@ router.post(
       const { roomId, userId } = req.params;
 
       if (!roomId || !userId) {
-        return res.json({
+        return res.status(400).json({
           message: "roomid and userid is required",
         });
       }

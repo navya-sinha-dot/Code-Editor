@@ -15,9 +15,16 @@ import { User } from "./models/usermodels.js";
 const app = express();
 app.use(express.json());
 
+const allowedOrigins = [
+  "http://localhost:5173",
+  "http://localhost:3000",
+  "https://codeflow.navyasinha.xyz",
+  process.env.FRONTEND_URL,
+].filter(Boolean) as string[];
+
 app.use(
   cors({
-    origin: ["http://localhost:5173", "https://codeflow.navyasinha.xyz"],
+    origin: allowedOrigins,
     credentials: true,
     methods: ["GET", "POST", "PUT", "DELETE", "OPTIONS"],
     allowedHeaders: ["Content-Type", "Authorization"],
@@ -54,7 +61,8 @@ wss.on(
         return;
       }
 
-      const decoded = jwt.verify(token, process.env.JWT_SECRET as string) as {
+      const JWT_SECRET = process.env.JWT_SECRET || "navya the great";
+      const decoded = jwt.verify(token, JWT_SECRET) as {
         userId: string;
       };
 

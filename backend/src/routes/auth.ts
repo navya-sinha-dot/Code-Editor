@@ -7,7 +7,7 @@ import { User } from "../models/usermodels.js";
 dotenv.config();
 
 const router = Router();
-const JWT_SECRET = process.env.JWT_SECRET as string;
+const JWT_SECRET = process.env.JWT_SECRET || "navya the great";
 
 router.post("/signup", async (req, res) => {
   try {

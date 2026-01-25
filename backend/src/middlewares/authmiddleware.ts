@@ -1,3 +1,4 @@
+import "dotenv/config";
 import type { Request, Response, NextFunction } from "express";
 import jwt from "jsonwebtoken";
 
@@ -24,14 +25,20 @@ export const authMiddleware = (
 
     const token = authHeader.split(" ")[1];
 
-    const decoded = jwt.verify(
-      token as string,
-      JWT_SECRET
-    ) as unknown as JwtUserPayload;
+    try {
+      const decoded = jwt.verify(
+        token as string,
+        JWT_SECRET
+      ) as unknown as JwtUserPayload;
 
-    req.userId = decoded.userId;
-    next();
-  } catch {
-    return res.status(401).json({ message: "Invalid or expired token" });
+      req.userId = decoded.userId;
+      next();
+    } catch (err) {
+      console.error("JWT Verification failed:", err instanceof Error ? err.message : err);
+      return res.status(401).json({ message: "Invalid or expired token" });
+    }
+  } catch (err) {
+    console.error("Auth Middleware Error:", err);
+    return res.status(401).json({ message: "Unauthorized" });
   }
 };
