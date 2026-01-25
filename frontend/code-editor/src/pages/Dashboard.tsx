@@ -195,8 +195,15 @@ export default function Dashboard() {
           </h2>
 
           {loading ? (
-            <div className="py-12 text-center text-slate-500 text-sm">
-              Loading projects…
+            <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+              {[...Array(6)].map((_, i) => (
+                <div
+                  key={i}
+                  className="relative overflow-hidden h-32 rounded-xl bg-[#12121a]/90"
+                >
+                  <div className="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent animate-shimmer" />
+                </div>
+              ))}
             </div>
           ) : (
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
@@ -319,8 +326,9 @@ function ConfirmModal({
           </button>
           <button
             onClick={onConfirm}
-            className={`px-3 py-1.5 text-xs rounded-sm text-white cursor-pointer ${danger ? "bg-[#480663]" : "bg-[#480663]"
-              }`}
+            className={`px-3 py-1.5 text-xs rounded-sm text-white cursor-pointer ${
+              danger ? "bg-[#480663]" : "bg-[#480663]"
+            }`}
           >
             {confirmText}
           </button>
