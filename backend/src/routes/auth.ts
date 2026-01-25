@@ -14,14 +14,14 @@ router.post("/signup", async (req, res) => {
     const { name, email, password } = req.body;
 
     if (!name || !email || !password) {
-      return res.json({
+      return res.status(400).json({
         message: "All the fields are required",
       });
     }
     const existinguser = await User.findOne({ email });
 
     if (existinguser) {
-      return res.json({
+      return res.status(409).json({
         message: "Email already exists",
       });
     }
@@ -50,7 +50,7 @@ router.post("/signup", async (req, res) => {
       },
     });
   } catch (err) {
-    res.json({
+    res.status(500).json({
       message: "Signup failed",
     });
   }
@@ -61,7 +61,7 @@ router.post("/login", async (req, res) => {
     const { email, password } = req.body;
 
     if (!email || !password) {
-      return res.json({
+      return res.status(400).json({
         message: "All fields are required",
       });
     }
@@ -69,15 +69,15 @@ router.post("/login", async (req, res) => {
     const user = await User.findOne({ email });
 
     if (!user) {
-      return res.json({
-        message: "Invalid credentials",
+      return res.status(403).json({
+        message: "please signup first",
       });
     }
 
     const isMatch = await bcrypt.compare(password, user.passwordhash);
 
     if (!isMatch) {
-      return res.json({
+      return res.status(401).json({
         message: "Invalid Credentials",
       });
     }
@@ -93,7 +93,7 @@ router.post("/login", async (req, res) => {
       token,
     });
   } catch (err) {
-    return res.json({
+    return res.status(500).json({
       message: "Login failed",
     });
   }
