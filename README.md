@@ -1,4 +1,4 @@
-# Collaborative Cloud Code Editor
+# Collaborative Code Editor
 
 A powerful, real-time collaborative code editor built for teams. Write, compile, and chat in sync with a modern, high-performance interface.
 
