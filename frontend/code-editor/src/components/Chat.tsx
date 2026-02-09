@@ -1,8 +1,9 @@
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState, useMemo } from "react";
 import { useWebSocket } from "../hooks/useWebSocket";
 import { Send, Users, MessageSquare, User, X } from "lucide-react";
 import { getToken } from "../utils/token";
 import { BACKEND_URL } from "../config";
+import { useOthers } from "../../liveblocks.config";
 
 interface ChatMessage {
   userId: string;
@@ -37,6 +38,23 @@ export default function Chat({ roomId }: { roomId: string }) {
   const bottomRef = useRef<HTMLDivElement | null>(null);
 
   const currentUserId = getCurrentUserId();
+
+
+  const others = useOthers();
+
+  const onlineUserIds = useMemo(() => {
+    const ids = new Set<string>();
+    if (currentUserId) {
+      ids.add(currentUserId);
+    }
+    others.forEach((other) => {
+      if (other.connectionId && other.id) {
+
+        ids.add(other.id);
+      }
+    });
+    return ids;
+  }, [others, currentUserId]);
 
   const { send, isReady } = useWebSocket((data) => {
     if (data.type === "chat:history") {
@@ -133,11 +151,10 @@ export default function Chat({ roomId }: { roomId: string }) {
       <div className="h-9 flex items-center px-2 border-b border-[#3e3e42] bg-[#252526]">
         <button
           onClick={() => setActiveTab("chat")}
-          className={`flex items-center gap-1 px-2 py-1 text-xs rounded-sm ${
-            activeTab === "chat"
-              ? "bg-[#37373d] text-white"
-              : "text-[#cccccc] hover:bg-[#2d2d30]"
-          }`}
+          className={`flex items-center gap-1 px-2 py-1 text-xs rounded-sm ${activeTab === "chat"
+            ? "bg-[#37373d] text-white"
+            : "text-[#cccccc] hover:bg-[#2d2d30]"
+            }`}
         >
           <MessageSquare size={12} />
           Chat
@@ -145,11 +162,10 @@ export default function Chat({ roomId }: { roomId: string }) {
 
         <button
           onClick={() => setActiveTab("participants")}
-          className={`ml-1 flex items-center gap-1 px-2 py-1 text-xs rounded-sm ${
-            activeTab === "participants"
-              ? "bg-[#37373d] text-white"
-              : "text-[#cccccc] hover:bg-[#2d2d30]"
-          }`}
+          className={`ml-1 flex items-center gap-1 px-2 py-1 text-xs rounded-sm ${activeTab === "participants"
+            ? "bg-[#37373d] text-white"
+            : "text-[#cccccc] hover:bg-[#2d2d30]"
+            }`}
         >
           <Users size={12} />
           Participants
@@ -200,31 +216,44 @@ export default function Chat({ roomId }: { roomId: string }) {
 
       {activeTab === "participants" && (
         <div className="flex-1 overflow-y-auto px-3 py-2">
-          {participants.map((p) => (
-            <div
-              key={p.userId}
-              className="flex items-center justify-between py-1 text-xs text-[#cccccc]"
-            >
-              <div className="flex items-center gap-2">
-                <User size={14} className="text-[#9cdcfe]" />
-                {p.name}
-                {p.role === "OWNER" && (
-                  <span className="ml-1 text-[10px] text-yellow-400">
-                    (Owner)
+          {participants.map((p) => {
+            const isOnline = onlineUserIds.has(p.userId);
+            return (
+              <div
+                key={p.userId}
+                className="flex items-center justify-between py-1.5 text-xs text-[#cccccc]"
+              >
+                <div className="flex items-center gap-2">
+                  {/* Online/Offline status indicator */}
+                  <span
+                    className={`w-2.5 h-2.5 rounded-full flex-shrink-0 ${isOnline
+                      ? "bg-green-500 shadow-[0_0_6px_rgba(34,197,94,0.6)]"
+                      : "bg-gray-500"
+                      }`}
+                    title={isOnline ? "Online" : "Offline"}
+                  />
+                  <User size={14} className="text-[#9cdcfe]" />
+                  <span className={isOnline ? "text-[#cccccc]" : "text-[#858585]"}>
+                    {p.name}
                   </span>
+                  {p.role === "OWNER" && (
+                    <span className="ml-1 text-[10px] text-yellow-400">
+                      (Owner)
+                    </span>
+                  )}
+                </div>
+
+                {isOwner && p.userId !== currentUserId && (
+                  <button
+                    onClick={() => removeParticipant(p.userId)}
+                    className="text-red-400 hover:text-red-300"
+                  >
+                    <X size={12} />
+                  </button>
                 )}
               </div>
-
-              {isOwner && p.userId !== currentUserId && (
-                <button
-                  onClick={() => removeParticipant(p.userId)}
-                  className="text-red-400 hover:text-red-300"
-                >
-                  <X size={12} />
-                </button>
-              )}
-            </div>
-          ))}
+            );
+          })}
         </div>
       )}
     </div>
