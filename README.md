@@ -1,10 +1,8 @@
-# 🚀 Collaborative Cloud Code Editor
+# Collaborative Code Editor
 
 A powerful, real-time collaborative code editor built for teams. Write, compile, and chat in sync with a modern, high-performance interface.
 
-![Project Preview](https://via.placeholder.com/1200x600/0f172a/ffffff?text=Cloud+Editor+Preview)
-
-## ✨ Features
+## Features
 
 - **Real-time Collaboration**: Powered by **Yjs** and **Liveblocks**, experience sub-100ms synchronization across multiple users.
 - **Advanced Editor**: Integrated with **Monaco Editor** (the engine behind VS Code), providing syntax highlighting, IntelliSense, and multi-cursor support.
@@ -17,7 +15,7 @@ A powerful, real-time collaborative code editor built for teams. Write, compile,
 
 ---
 
-## 🛠️ Tech Stack
+## Tech Stack
 
 ### Frontend
 - **Framework**: [React 19](https://react.dev/)
@@ -36,7 +34,7 @@ A powerful, real-time collaborative code editor built for teams. Write, compile,
 
 ---
 
-## 🚀 Getting Started
+## Getting Started
 
 ### Prerequisites
 - Node.js (v18+)
@@ -84,7 +82,7 @@ npm run dev
 
 ---
 
-## 📂 Project Structure
+## Project Structure
 
 ```text
 code-editor/
@@ -102,7 +100,7 @@ code-editor/
     └── ...
 ```
 
-## 🤝 Contributing
+## Contributing
 
 Contributions are welcome! Please feel free to submit a Pull Request.
 
@@ -111,11 +109,8 @@ Contributions are welcome! Please feel free to submit a Pull Request.
 3. Commit your Changes (`git commit -m 'Add some AmazingFeature'`)
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
-
-## 📄 License
-
-Distributed under the MIT License. See `LICENSE` for more information.
+ for more information.
 
 ---
 
-<p align="center">Made with ❤️ by the team</p>
+<p align="center">Built by Navya Sinha</p>
