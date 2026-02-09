@@ -1,6 +1,7 @@
 import { Link, useNavigate, useLocation } from "react-router-dom";
 import { getToken, clearToken } from "../utils/token";
 import { LogOut, LayoutDashboard, Code2, ChevronRight } from "lucide-react";
+import { Button } from "@/components/ui/button";
 
 export default function Navbar() {
   const token = getToken();
@@ -34,13 +35,15 @@ export default function Navbar() {
           </Link>
         </div>
 
-        <button
+        <Button
+          variant="ghost"
+          size="sm"
           onClick={handleLogout}
-          className="flex items-center gap-2 px-3 py-1.5 text-sm text-slate-400 hover:text-violet-400 hover:bg-violet-500/10 rounded-lg transition-all"
+          className="text-slate-400 hover:text-violet-400 hover:bg-violet-500/10"
         >
-          <LogOut size={16} />
+          <LogOut className="mr-2 h-4 w-4" />
           <span className="hidden sm:inline">Logout</span>
-        </button>
+        </Button>
       </nav>
     );
   }
@@ -58,35 +61,33 @@ export default function Navbar() {
       <div className="flex items-center gap-3">
         {token ? (
           <>
-            <Link
-              to="/dashboard"
-              className="flex items-center gap-2 px-4 py-2 text-slate-300 hover:text-white hover:bg-white/5 rounded-lg transition-all"
+            <Button
+              variant="ghost"
+              asChild
+              className="text-slate-300 hover:text-white hover:bg-white/5"
             >
-              <LayoutDashboard size={18} />
-              <span>Dashboard</span>
-            </Link>
-            <button
+              <Link to="/dashboard">
+                <LayoutDashboard className="mr-2 h-4 w-4" />
+                <span>Dashboard</span>
+              </Link>
+            </Button>
+            <Button
+              variant="outline"
               onClick={handleLogout}
-              className="flex items-center gap-2 px-4 py-2 text-slate-400 hover:text-violet-400 hover:bg-violet-500/10 border border-transparent hover:border-violet-500/20 rounded-lg transition-all"
+              className="text-slate-400 hover:text-violet-400 hover:bg-violet-500/10 border-transparent hover:border-violet-500/20"
             >
-              <LogOut size={18} />
+              <LogOut className="mr-2 h-4 w-4" />
               <span>Logout</span>
-            </button>
+            </Button>
           </>
         ) : (
           <>
-            <Link
-              to="/login"
-              className="px-4 py-2 text-slate-300 hover:text-white transition-colors"
-            >
-              Sign In
-            </Link>
-            <Link
-              to="/signup"
-              className="px-5 py-2.5 bg-[#4C1170] hover:from-violet-500 hover:to-indigo-500 text-white font-medium rounded-lg transition-all shadow-lg shadow-violet-500/20"
-            >
-              Get Started
-            </Link>
+            <Button variant="ghost" asChild className="text-slate-300 hover:text-white">
+              <Link to="/login">Sign In</Link>
+            </Button>
+            <Button asChild className="bg-[#4C1170] hover:bg-[#5a1d82]">
+              <Link to="/signup">Get Started</Link>
+            </Button>
           </>
         )}
       </div>

@@ -13,10 +13,22 @@ import {
   Check,
   Trash2,
   LogOut,
-  X,
 } from "lucide-react";
 import { BACKEND_URL } from "../config";
 import { Component as EtheralShadow } from "../components/eternal-shadows";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogCancel,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 
 export default function Dashboard() {
   const [rooms, setRooms] = useState<any[]>([]);
@@ -25,8 +37,8 @@ export default function Dashboard() {
   const [loading, setLoading] = useState(true);
   const [copiedId, setCopiedId] = useState<string | null>(null);
 
-  const [leaveModal, setLeaveModal] = useState<any | null>(null);
-  const [deleteModal, setDeleteModal] = useState<any | null>(null);
+  const [leaveModalRoom, setLeaveModalRoom] = useState<any | null>(null);
+  const [deleteModalRoom, setDeleteModalRoom] = useState<any | null>(null);
 
   const navigate = useNavigate();
 
@@ -96,23 +108,25 @@ export default function Dashboard() {
   };
 
   const confirmLeave = async () => {
-    await fetch(`${BACKEND_URL}/api/rooms/${leaveModal._id}/leave`, {
+    if (!leaveModalRoom) return;
+    await fetch(`${BACKEND_URL}/api/rooms/${leaveModalRoom._id}/leave`, {
       method: "POST",
       headers: { Authorization: `Bearer ${getToken()}` },
     });
 
-    setRooms((prev) => prev.filter((r) => r._id !== leaveModal._id));
-    setLeaveModal(null);
+    setRooms((prev) => prev.filter((r) => r._id !== leaveModalRoom._id));
+    setLeaveModalRoom(null);
   };
 
   const confirmDelete = async () => {
-    await fetch(`${BACKEND_URL}/api/rooms/${deleteModal._id}`, {
+    if (!deleteModalRoom) return;
+    await fetch(`${BACKEND_URL}/api/rooms/${deleteModalRoom._id}`, {
       method: "DELETE",
       headers: { Authorization: `Bearer ${getToken()}` },
     });
 
-    setRooms((prev) => prev.filter((r) => r._id !== deleteModal._id));
-    setDeleteModal(null);
+    setRooms((prev) => prev.filter((r) => r._id !== deleteModalRoom._id));
+    setDeleteModalRoom(null);
   };
 
   const copyRoomId = (id: string, e: React.MouseEvent) => {
@@ -147,47 +161,55 @@ export default function Dashboard() {
           </div>
 
           <div className="grid grid-cols-1 md:grid-cols-2 gap-6 mb-12">
-            <div className="rounded-xl bg-[#12121a]/90 p-6">
-              <h2 className="text-sm text-slate-300 mb-4 flex items-center gap-2">
-                <Plus size={16} /> New Project
-              </h2>
-              <div className="flex gap-3">
-                <input
-                  value={newRoomName}
-                  onChange={(e) => setNewRoomName(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && createRoom()}
-                  placeholder="Project name"
-                  className="flex-1 bg-[#1a1a24] rounded-lg px-4 py-2.5"
-                />
-                <button
-                  onClick={createRoom}
-                  className="bg-[#4C1170] px-4 rounded-lg flex items-center gap-2"
-                >
-                  Create <ArrowRight size={14} />
-                </button>
-              </div>
-            </div>
+            <Card className="border-white/5 bg-[#12121a]/90">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-sm text-slate-300 flex items-center gap-2">
+                  <Plus size={16} /> New Project
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-3">
+                  <Input
+                    value={newRoomName}
+                    onChange={(e) => setNewRoomName(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && createRoom()}
+                    placeholder="Project name"
+                    className="flex-1"
+                  />
+                  <Button
+                    onClick={createRoom}
+                    className="bg-[#4C1170] hover:bg-[#5a1d82]"
+                  >
+                    Create <ArrowRight className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
 
-            <div className="rounded-xl bg-[#12121a]/90 p-6">
-              <h2 className="text-sm text-slate-300 mb-4 flex items-center gap-2">
-                <LogIn size={16} /> Join Session
-              </h2>
-              <div className="flex gap-3">
-                <input
-                  value={joinRoomId}
-                  onChange={(e) => setJoinRoomId(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && joinRoom()}
-                  placeholder="Room ID"
-                  className="flex-1 bg-[#1a1a24] rounded-lg px-4 py-2.5 font-mono"
-                />
-                <button
-                  onClick={joinRoom}
-                  className="bg-[#4C1170] px-4 rounded-lg flex items-center gap-2"
-                >
-                  Join <Users size={14} />
-                </button>
-              </div>
-            </div>
+            <Card className="border-white/5 bg-[#12121a]/90">
+              <CardHeader className="pb-4">
+                <CardTitle className="text-sm text-slate-300 flex items-center gap-2">
+                  <LogIn size={16} /> Join Session
+                </CardTitle>
+              </CardHeader>
+              <CardContent>
+                <div className="flex gap-3">
+                  <Input
+                    value={joinRoomId}
+                    onChange={(e) => setJoinRoomId(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && joinRoom()}
+                    placeholder="Room ID"
+                    className="flex-1 font-mono"
+                  />
+                  <Button
+                    onClick={joinRoom}
+                    className="bg-[#4C1170] hover:bg-[#5a1d82]"
+                  >
+                    Join <Users className="ml-2 h-4 w-4" />
+                  </Button>
+                </div>
+              </CardContent>
+            </Card>
           </div>
 
           <h2 className="text-md text-slate-400 mb-4 flex items-center gap-2">
@@ -214,126 +236,107 @@ export default function Dashboard() {
               )}
 
               {rooms.map((room) => (
-                <div
+                <Card
                   key={room._id}
                   onClick={() => navigate(`/editor/${room._id}`)}
-                  className="cursor-default rounded-xl bg-[#12121a]/90 p-5"
+                  className="cursor-pointer group hover:border-violet-500/50 transition-colors bg-[#12121a]/90 border-white/5"
                 >
-                  <div className="flex justify-between mb-3">
-                    <button
-                      onClick={(e) => copyRoomId(room._id, e)}
-                      className="text-xs font-mono text-slate-500 flex gap-1 cursor-pointer"
-                    >
-                      {copiedId === room._id ? (
-                        <>
-                          <Check size={12} /> Copied
-                        </>
-                      ) : (
-                        <>
-                          <Copy size={12} /> {room._id.slice(-6)}
-                        </>
-                      )}
-                    </button>
-
-                    <div className="flex gap-2">
-                      <button
-                        onClick={(e) => {
-                          e.stopPropagation();
-                          setLeaveModal(room);
-                        }}
-                        className="cursor-pointer"
+                  <CardContent className="p-5">
+                    <div className="flex justify-between mb-3">
+                      <Button
+                        variant="ghost"
+                        size="sm"
+                        onClick={(e) => copyRoomId(room._id, e)}
+                        className="h-6 px-2 text-xs font-mono text-slate-500 hover:text-white"
                       >
-                        <LogOut size={14} />
-                      </button>
+                        {copiedId === room._id ? (
+                          <>
+                            <Check className="mr-1 h-3 w-3" /> Copied
+                          </>
+                        ) : (
+                          <>
+                            <Copy className="mr-1 h-3 w-3" /> {room._id.slice(-6)}
+                          </>
+                        )}
+                      </Button>
 
-                      {room.role === "OWNER" && (
-                        <button
+                      <div className="flex gap-2">
+                        <Button
+                          variant="ghost"
+                          size="icon"
                           onClick={(e) => {
                             e.stopPropagation();
-                            setDeleteModal(room);
+                            setLeaveModalRoom(room);
                           }}
-                          className="cursor-pointer"
+                          className="h-7 w-7 text-slate-400 hover:text-white"
                         >
-                          <Trash2 size={14} />
-                        </button>
-                      )}
+                          <LogOut className="h-4 w-4" />
+                        </Button>
+
+                        {room.role === "OWNER" && (
+                          <Button
+                            variant="ghost"
+                            size="icon"
+                            onClick={(e) => {
+                              e.stopPropagation();
+                              setDeleteModalRoom(room);
+                            }}
+                            className="h-7 w-7 text-slate-400 hover:text-red-400"
+                          >
+                            <Trash2 className="h-4 w-4" />
+                          </Button>
+                        )}
+                      </div>
                     </div>
-                  </div>
 
-                  <h3 className="text-slate-200 font-medium">
-                    {room.name || "Untitled Project"}
-                  </h3>
+                    <h3 className="text-slate-200 font-medium group-hover:text-violet-400 transition-colors mb-1">
+                      {room.name || "Untitled Project"}
+                    </h3>
 
-                  <div className="text-xs text-slate-600 flex items-center gap-1 mt-1">
-                    <Clock size={12} /> Recently updated
-                  </div>
-                </div>
+                    <div className="text-xs text-slate-600 flex items-center gap-1">
+                      <Clock className="h-3 w-3" /> Recently updated
+                    </div>
+                  </CardContent>
+                </Card>
               ))}
             </div>
           )}
         </div>
       </div>
 
-      {leaveModal && (
-        <ConfirmModal
-          title="Leave Room"
-          text={`Leave "${leaveModal.name}"?`}
-          confirmText="Leave"
-          onCancel={() => setLeaveModal(null)}
-          onConfirm={confirmLeave}
-        />
-      )}
+      <AlertDialog open={!!leaveModalRoom} onOpenChange={() => setLeaveModalRoom(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Leave Room</AlertDialogTitle>
+            <AlertDialogDescription>
+              Are you sure you want to leave "{leaveModalRoom?.name}"? You will need to join again via room ID.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmLeave} className="bg-violet-600 hover:bg-violet-700">
+              Leave
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
 
-      {deleteModal && (
-        <ConfirmModal
-          title="Delete Room"
-          text={`Delete "${deleteModal.name}" permanently?`}
-          confirmText="Delete"
-          danger
-          onCancel={() => setDeleteModal(null)}
-          onConfirm={confirmDelete}
-        />
-      )}
+      <AlertDialog open={!!deleteModalRoom} onOpenChange={() => setDeleteModalRoom(null)}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle className="text-red-400">Delete Room</AlertDialogTitle>
+            <AlertDialogDescription>
+              This action cannot be undone. This will permanently delete "{deleteModalRoom?.name}" and all its contents.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction onClick={confirmDelete} className="bg-red-600 hover:bg-red-700">
+              Delete
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
     </>
-  );
-}
-
-function ConfirmModal({
-  title,
-  text,
-  confirmText,
-  onCancel,
-  onConfirm,
-  danger,
-}: any) {
-  return (
-    <div className="fixed inset-0 z-50 flex items-center justify-center">
-      <div className="absolute inset-0 backdrop-blur-md" onClick={onCancel} />
-      <div className="relative bg-[#252526] border border-[#3e3e42] rounded-2xl w-96">
-        <div className="flex justify-between p-4">
-          <h3 className="text-lg text-[#cccccc]">{title}</h3>
-          <button onClick={onCancel} className="cursor-pointer">
-            <X size={16} />
-          </button>
-        </div>
-        <div className="px-4 pb-2 text-sm text-[#cccccc]">{text}</div>
-        <div className="flex justify-end gap-2 p-4 border-t border-[#3e3e42]">
-          <button
-            onClick={onCancel}
-            className="px-3 py-1.5 text-xs cursor-pointer"
-          >
-            Cancel
-          </button>
-          <button
-            onClick={onConfirm}
-            className={`px-3 py-1.5 text-xs rounded-sm text-white cursor-pointer ${
-              danger ? "bg-[#480663]" : "bg-[#480663]"
-            }`}
-          >
-            {confirmText}
-          </button>
-        </div>
-      </div>
-    </div>
   );
 }

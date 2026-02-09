@@ -3,6 +3,7 @@ import { motion } from "framer-motion";
 import { Code2, Zap, Users, Terminal, Cpu, Globe } from "lucide-react";
 import { getToken } from "../utils/token";
 import { Component as EtheralShadow } from "../components/eternal-shadows";
+import { Button } from "@/components/ui/button";
 
 export default function Landing() {
   const isLoggedIn = !!getToken();
@@ -44,21 +45,25 @@ export default function Landing() {
             chat.
           </motion.p>
 
-          {isLoggedIn ? (
-            <Link
-              to="/dashboard"
-              className="px-8 py-4 bg-[#4C1170] text-white text-lg font-semibold rounded-xl shadow-lg hover:scale-105 transition"
-            >
-              Go to Dashboard →
-            </Link>
-          ) : (
-            <Link
-              to="/signup"
-              className="px-8 py-4 bg-[#4C1170] text-white text-lg font-semibold rounded-xl shadow-lg hover:scale-105 transition"
-            >
-              Start Coding Free →
-            </Link>
-          )}
+          <div className="flex flex-col sm:flex-row gap-4">
+            {isLoggedIn ? (
+              <Button
+                asChild
+                size="lg"
+                className="bg-[#4C1170] hover:bg-[#5a1d82] text-white px-8 h-14 rounded-xl text-lg font-semibold shadow-xl hover:scale-105 transition"
+              >
+                <Link to="/dashboard">Go to Dashboard →</Link>
+              </Button>
+            ) : (
+              <Button
+                asChild
+                size="lg"
+                className="bg-[#4C1170] hover:bg-[#5a1d82] text-white px-8 h-14 rounded-xl text-lg font-semibold shadow-xl hover:scale-105 transition"
+              >
+                <Link to="/signup">Start Coding Free →</Link>
+              </Button>
+            )}
+          </div>
         </div>
       </div>
 

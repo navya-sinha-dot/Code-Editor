@@ -3,6 +3,10 @@ import { useNavigate, Link } from "react-router-dom";
 import { setToken } from "../utils/token";
 import { UserPlus, Mail, Lock, User, ArrowRight, Code2 } from "lucide-react";
 import { BACKEND_URL } from "../config";
+import { Button } from "@/components/ui/button";
+import { Input } from "@/components/ui/input";
+import { Label } from "@/components/ui/label";
+import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card";
 
 export default function Signup() {
   const [name, setName] = useState("");
@@ -63,115 +67,111 @@ export default function Signup() {
           </Link>
         </div>
 
-        <div className="bg-white/[0.02] p-8 rounded-2xl border border-white/5 shadow-xl backdrop-blur-sm">
-          <div className="text-center mb-8">
+        <Card className="border-white/5 bg-white/[0.02]">
+          <CardHeader className="text-center">
             <div className="w-14 h-14 mx-auto mb-4 rounded-2xl bg-violet-500/10 flex items-center justify-center border border-violet-500/20">
               <UserPlus size={28} className="text-violet-400" />
             </div>
-            <h2 className="text-2xl font-bold text-white mb-2">
-              Create account
-            </h2>
-            <p className="text-slate-500 text-sm">
+            <CardTitle className="text-2xl font-bold">Create account</CardTitle>
+            <CardDescription className="text-slate-500">
               Start collaborating in minutes
+            </CardDescription>
+          </CardHeader>
+          <CardContent>
+            {error && (
+              <div className="mb-6 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
+                {error}
+              </div>
+            )}
+
+            <div className="space-y-5">
+              <div className="space-y-2">
+                <Label htmlFor="name">Name</Label>
+                <div className="relative">
+                  <User
+                    size={18}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 z-10"
+                  />
+                  <Input
+                    id="name"
+                    type="text"
+                    value={name}
+                    className="pl-12"
+                    placeholder="Your Name"
+                    onChange={(e) => setName(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && submit()}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="email">Email</Label>
+                <div className="relative">
+                  <Mail
+                    size={18}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 z-10"
+                  />
+                  <Input
+                    id="email"
+                    type="email"
+                    value={email}
+                    className="pl-12"
+                    placeholder="you@example.com"
+                    onChange={(e) => setEmail(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && submit()}
+                  />
+                </div>
+              </div>
+
+              <div className="space-y-2">
+                <Label htmlFor="password">Password</Label>
+                <div className="relative">
+                  <Lock
+                    size={18}
+                    className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500 z-10"
+                  />
+                  <Input
+                    id="password"
+                    type="password"
+                    value={password}
+                    className="pl-12"
+                    placeholder="••••••••"
+                    onChange={(e) => setPassword(e.target.value)}
+                    onKeyDown={(e) => e.key === "Enter" && submit()}
+                  />
+                </div>
+              </div>
+
+              <Button
+                onClick={submit}
+                disabled={loading}
+                className="w-full bg-[#4C1170] hover:bg-[#5a1d82] h-12"
+              >
+                {loading ? (
+                  <>
+                    <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin mr-2" />
+                    Creating account...
+                  </>
+                ) : (
+                  <>
+                    Create Account
+                    <ArrowRight size={18} className="ml-2" />
+                  </>
+                )}
+              </Button>
+            </div>
+
+            <p className="text-sm text-center text-slate-500 mt-6">
+              Already have an account?{" "}
+              <Link
+                to="/login"
+                className="text-violet-400 hover:text-violet-300 font-medium transition-colors"
+              >
+                Sign in
+              </Link>
             </p>
-          </div>
-
-          {error && (
-            <div className="mb-6 p-3 rounded-xl bg-red-500/10 border border-red-500/20 text-red-400 text-sm text-center">
-              {error}
-            </div>
-          )}
-
-          <div className="space-y-5">
-            <div>
-              <label className="block text-sm font-medium text-slate-400 mb-2">
-                Name
-              </label>
-              <div className="relative">
-                <User
-                  size={18}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
-                />
-                <input
-                  type="text"
-                  value={name}
-                  className="w-full pl-12 pr-4 py-3.5 bg-[#1a1a24] border border-[#2a2a3a] rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all"
-                  placeholder="Your Name"
-                  onChange={(e) => setName(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && submit()}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-400 mb-2">
-                Email
-              </label>
-              <div className="relative">
-                <Mail
-                  size={18}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
-                />
-                <input
-                  type="email"
-                  value={email}
-                  className="w-full pl-12 pr-4 py-3.5 bg-[#1a1a24] border border-[#2a2a3a] rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all"
-                  placeholder="you@example.com"
-                  onChange={(e) => setEmail(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && submit()}
-                />
-              </div>
-            </div>
-
-            <div>
-              <label className="block text-sm font-medium text-slate-400 mb-2">
-                Password
-              </label>
-              <div className="relative">
-                <Lock
-                  size={18}
-                  className="absolute left-4 top-1/2 -translate-y-1/2 text-slate-500"
-                />
-                <input
-                  type="password"
-                  value={password}
-                  className="w-full pl-12 pr-4 py-3.5 bg-[#1a1a24] border border-[#2a2a3a] rounded-xl text-white placeholder-slate-600 focus:outline-none focus:border-violet-500/50 focus:ring-1 focus:ring-violet-500/20 transition-all"
-                  placeholder="••••••••"
-                  onChange={(e) => setPassword(e.target.value)}
-                  onKeyDown={(e) => e.key === "Enter" && submit()}
-                />
-              </div>
-            </div>
-
-            <button
-              onClick={submit}
-              disabled={loading}
-              className="w-full py-3.5 bg-[#4C1170] hover:from-violet-500 hover:to-indigo-500 text-white font-semibold rounded-xl transition-all shadow-lg shadow-violet-500/20 disabled:opacity-50 flex items-center justify-center gap-2"
-            >
-              {loading ? (
-                <>
-                  <div className="w-5 h-5 border-2 border-white/30 border-t-white rounded-full animate-spin" />
-                  Creating account...
-                </>
-              ) : (
-                <>
-                  Create Account
-                  <ArrowRight size={18} />
-                </>
-              )}
-            </button>
-          </div>
-
-          <p className="text-sm text-center text-slate-500 mt-6">
-            Already have an account?{" "}
-            <Link
-              to="/login"
-              className="text-violet-400 hover:text-violet-300 font-medium transition-colors"
-            >
-              Sign in
-            </Link>
-          </p>
-        </div>
+          </CardContent>
+        </Card>
       </div>
     </div>
   );

@@ -15,7 +15,7 @@ import {
 interface FileItem {
   _id: string;
   name: string;
-  isFolder?: boolean;
+  type: "FILE" | "FOLDER";
   parentId?: string | null;
 }
 
@@ -29,6 +29,8 @@ export default function FileTree({ activeFileId, onSelectFile }: any) {
   const [showNewFileInput, setShowNewFileInput] = useState(false);
   const [newItemName, setNewItemName] = useState("");
   const [deleteModal, setDeleteModal] = useState<FileItem | null>(null);
+  const [currentFolderId, setCurrentFolderId] = useState<string | null>(null);
+  const [createType, setCreateType] = useState<"FILE" | "FOLDER">("FILE");
 
   useEffect(() => {
     if (!roomId) return;
@@ -42,18 +44,27 @@ export default function FileTree({ activeFileId, onSelectFile }: any) {
   const handleCreateFile = async () => {
     if (!roomId || !newItemName.trim()) return;
 
-    const language = newItemName.split(".").pop() || "plaintext";
+    const isFolder = createType === "FOLDER";
+
+    const language = isFolder
+      ? undefined
+      : newItemName.split(".").pop() || "plaintext";
 
     const res = await createFile({
       roomId,
       name: newItemName,
+      type: isFolder ? "FOLDER" : "FILE",
+      content: isFolder ? undefined : "",
+      parentId: currentFolderId,
       language,
-      content: "",
-      parentId: null,
     });
 
     setFiles((prev) => [...prev, res.data]);
-    onSelectFile(res.data);
+
+    if (!isFolder) {
+      onSelectFile(res.data);
+    }
+
     setShowNewFileInput(false);
     setNewItemName("");
   };
@@ -92,16 +103,21 @@ export default function FileTree({ activeFileId, onSelectFile }: any) {
     files.filter((f) => f.parentId === parentId);
 
   const renderFileItem = (file: FileItem, depth: number = 0) => {
-    const isFolder = file.isFolder;
+    const isFolder = file.type == "FOLDER";
     const isExpanded = expandedFolders.has(file._id);
     const children = getChildren(file._id);
 
     return (
       <div key={file._id}>
         <div
-          onClick={() =>
-            isFolder ? toggleFolder(file._id) : onSelectFile(file)
-          }
+          onClick={() => {
+            if (isFolder) {
+              toggleFolder(file._id);
+              setCurrentFolderId(file._id);
+            } else {
+              onSelectFile(file);
+            }
+          }}
           className={`group flex items-center gap-1.5 px-2 py-1 cursor-pointer ${
             activeFileId === file._id ? "bg-[#37373d]" : "hover:bg-[#2a2d2e]"
           }`}
@@ -154,12 +170,29 @@ export default function FileTree({ activeFileId, onSelectFile }: any) {
       <div className="h-full flex flex-col">
         <div className="h-9 flex items-center justify-between px-2 border-b border-[#3e3e42]">
           <span className="text-xs text-[#cccccc] uppercase">Explorer</span>
-          <button
-            onClick={() => setShowNewFileInput(true)}
-            className="p-1 text-[#858585] hover:bg-[#2a2d2e] rounded-sm"
-          >
-            <Plus size={14} />
-          </button>
+          <div className="flex items-center gap-1">
+            <button
+              onClick={() => {
+                setCreateType("FILE");
+                setShowNewFileInput(true);
+              }}
+              className="p-1 text-[#858585] hover:bg-[#2a2d2e] rounded-sm"
+              title="New File"
+            >
+              <File size={14} />
+            </button>
+
+            <button
+              onClick={() => {
+                setCreateType("FOLDER");
+                setShowNewFileInput(true);
+              }}
+              className="p-1 text-[#858585] hover:bg-[#2a2d2e] rounded-sm"
+              title="New Folder"
+            >
+              <Folder size={14} />
+            </button>
+          </div>
         </div>
 
         {showNewFileInput && (
@@ -176,7 +209,9 @@ export default function FileTree({ activeFileId, onSelectFile }: any) {
                   setNewItemName("");
                 }
               }}
-              placeholder="filename.ext"
+              placeholder={
+                createType === "FOLDER" ? "folder-name" : "filename.ext"
+              }
               className="w-full px-2 py-1 bg-[#3c3c3c] border border-[#007acc] rounded-sm text-xs text-[#cccccc] placeholder-[#858585] focus:outline-none"
               autoFocus
             />
