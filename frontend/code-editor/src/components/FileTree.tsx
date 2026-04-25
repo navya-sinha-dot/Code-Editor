@@ -5,7 +5,6 @@ import {
   File,
   Folder,
   FolderOpen,
-  Plus,
   Trash2,
   ChevronRight,
   ChevronDown,
@@ -118,9 +117,8 @@ export default function FileTree({ activeFileId, onSelectFile }: any) {
               onSelectFile(file);
             }
           }}
-          className={`group flex items-center gap-1.5 px-2 py-1 cursor-pointer ${
-            activeFileId === file._id ? "bg-[#37373d]" : "hover:bg-[#2a2d2e]"
-          }`}
+          className={`group flex items-center gap-1.5 px-2 py-1 cursor-pointer ${activeFileId === file._id ? "bg-[#37373d]" : "hover:bg-[#2a2d2e]"
+            }`}
           style={{ paddingLeft: `${8 + depth * 16}px` }}
         >
           {isFolder ? (
