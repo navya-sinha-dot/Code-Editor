@@ -4,6 +4,7 @@ import jwt from "jsonwebtoken";
 import { Liveblocks } from "@liveblocks/node";
 import dotenv from "dotenv";
 import { User } from "../models/usermodels.js";
+import { isRoomMember } from "../utils/roomAuth.js";
 
 dotenv.config();
 
@@ -32,6 +33,7 @@ function isAuthJwtPayload(
 
 router.post("/auth", async (req, res) => {
   try {
+    const { room } = req.body;
     const authHeader = req.headers.authorization;
 
     if (!authHeader || !authHeader.startsWith("Bearer ")) {
@@ -50,7 +52,13 @@ router.post("/auth", async (req, res) => {
       return res.status(403).json({ error: "Invalid token payload" });
     }
 
-    // Fetch actual user name from database
+    if (!(await isRoomMember(room, decoded.userId))) {
+      return res.status(403).json({
+        error: "forbidden",
+        reason: "You are not a member of this room",
+      });
+    }
+
     const user = await User.findById(decoded.userId).select("name").lean();
     const userName = user?.name || "Anonymous";
 
@@ -60,7 +68,7 @@ router.post("/auth", async (req, res) => {
       },
     });
 
-    session.allow("*", session.FULL_ACCESS);
+    session.allow(room, session.FULL_ACCESS);
 
     const { status, body } = await session.authorize();
     res.status(status).send(body);

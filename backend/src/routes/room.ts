@@ -4,6 +4,7 @@ import mongoose from "mongoose";
 import { Room } from "../models/roommodels.js";
 import { authMiddleware } from "../middlewares/authmiddleware.js";
 import type { AuthRequest } from "../middlewares/authmiddleware.js";
+import { isRoomMember } from "../utils/roomAuth.js";
 
 const router = Router();
 
@@ -207,6 +208,10 @@ router.get(
 
       if (!room) {
         return res.status(404).json({ message: "Room not found" });
+      }
+
+      if (!(await isRoomMember(roomId, req.userId))) {
+        return res.status(403).json({ message: "You are not a member of this room" });
       }
 
       const participants = room.members.map((m) => ({

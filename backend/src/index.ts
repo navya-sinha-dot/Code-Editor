@@ -9,8 +9,10 @@ import authRoutes from "./routes/auth.js";
 import roomRoutes from "./routes/room.js";
 import fileRoutes from "./routes/file.js";
 import runRoutes from "./routes/run.js";
+import liveblocksRoutes from "./routes/liveblocks.js";
 import { Message } from "./models/msgmodels.js";
 import { User } from "./models/usermodels.js";
+import { isRoomMember } from "./utils/roomAuth.js";
 
 const app = express();
 app.use(express.json());
@@ -45,6 +47,7 @@ interface AuthenticatedWebSocket extends WebSocket {
 app.use("/api/auth", authRoutes);
 app.use("/api/rooms", roomRoutes);
 app.use("/api/files", fileRoutes);
+app.use("/api/liveblocks", liveblocksRoutes);
 app.use("/api", runRoutes);
 
 const rooms = new Map<string, Set<AuthenticatedWebSocket>>();
@@ -76,6 +79,16 @@ wss.on(
           const { roomId } = message.payload;
           if (!roomId || !ws.userId) return;
 
+          if (!(await isRoomMember(roomId, ws.userId))) {
+            ws.send(
+              JSON.stringify({
+                type: "error",
+                payload: { message: "Not authorized for this room" },
+              })
+            );
+            return;
+          }
+
           if (!rooms.has(roomId)) {
             rooms.set(roomId, new Set());
           }
@@ -104,9 +117,26 @@ wss.on(
           console.log(`${ws.userId} joined room ${roomId}`);
         }
 
+        if (message.type === "room:leave") {
+          const { roomId } = message.payload || {};
+          if (roomId) {
+            rooms.get(roomId)?.delete(ws);
+          }
+        }
+
         if (message.type === "chat:send") {
           const { roomId, text } = message.payload || {};
           if (!ws.userId || !roomId || !text) return;
+
+          if (!(await isRoomMember(roomId, ws.userId))) {
+            ws.send(
+              JSON.stringify({
+                type: "error",
+                payload: { message: "Not authorized for this room" },
+              })
+            );
+            return;
+          }
 
           const savedMessage = await Message.create({
             roomId,

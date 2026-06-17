@@ -1,5 +1,5 @@
 import { useState, useRef, useEffect } from "react";
-import { useParams } from "react-router-dom";
+import { useNavigate, useParams } from "react-router-dom";
 import Editor from "../components/Editor";
 import Chat from "../components/Chat";
 import FileTree from "../components/FileTree";
@@ -7,6 +7,17 @@ import Terminal from "../components/Terminal";
 import { runCode } from "../api/runcode";
 import { RoomProvider } from "../../liveblocks.config";
 import { getLanguageFromFileName } from "../utils/fileUtils";
+import { BACKEND_URL } from "../config";
+import { getToken } from "../utils/token";
+import {
+  AlertDialog,
+  AlertDialogAction,
+  AlertDialogContent,
+  AlertDialogDescription,
+  AlertDialogFooter,
+  AlertDialogHeader,
+  AlertDialogTitle,
+} from "@/components/ui/alert-dialog";
 import {
   Play,
   MessageSquare,
@@ -18,8 +29,12 @@ import {
 
 export default function EditorPage() {
   const { roomId } = useParams();
+  const navigate = useNavigate();
 
   const [showChat, setShowChat] = useState(true);
+  const [accessState, setAccessState] = useState<
+    "checking" | "allowed" | "denied"
+  >("checking");
   const [activeFile, setActiveFile] = useState<{
     _id: string;
     name: string;
@@ -38,8 +53,6 @@ export default function EditorPage() {
 
   const fileTreeRef = useRef<HTMLDivElement>(null);
   const terminalRef = useRef<HTMLDivElement>(null);
-
-  if (!roomId) return null;
 
   const handleRun = async () => {
     try {
@@ -104,6 +117,8 @@ export default function EditorPage() {
   };
 
   const handleCopyRoomId = async () => {
+    if (!roomId) return;
+
     try {
       await navigator.clipboard.writeText(roomId);
       setCopied(true);
@@ -112,6 +127,51 @@ export default function EditorPage() {
       console.error("Failed to copy:", err);
     }
   };
+
+  useEffect(() => {
+    if (!roomId) {
+      setAccessState("denied");
+      return;
+    }
+
+    const token = getToken();
+    if (!token) {
+      navigate("/login");
+      return;
+    }
+
+    let cancelled = false;
+
+    const checkAccess = async () => {
+      try {
+        const res = await fetch(
+          `${BACKEND_URL}/api/rooms/${roomId}/participants`,
+          {
+            headers: { Authorization: `Bearer ${token}` },
+          }
+        );
+
+        if (cancelled) return;
+
+        if (res.status === 401) {
+          navigate("/login");
+          return;
+        }
+
+        setAccessState(res.ok ? "allowed" : "denied");
+      } catch {
+        if (!cancelled) {
+          setAccessState("denied");
+        }
+      }
+    };
+
+    checkAccess();
+
+    return () => {
+      cancelled = true;
+    };
+  }, [roomId, navigate]);
 
   useEffect(() => {
     if (isDraggingFileTree || isDraggingTerminal) {
@@ -123,6 +183,42 @@ export default function EditorPage() {
       };
     }
   }, [isDraggingFileTree, isDraggingTerminal]);
+
+  if (!roomId) return null;
+
+  if (accessState === "checking") {
+    return (
+      <div className="flex h-[calc(100vh-48px)] items-center justify-center bg-[#1e1e1e] text-sm text-[#cccccc]">
+        Checking room access...
+      </div>
+    );
+  }
+
+  if (accessState === "denied") {
+    return (
+      <div className="flex h-[calc(100vh-48px)] items-center justify-center bg-[#1e1e1e]">
+        <AlertDialog open>
+          <AlertDialogContent>
+            <AlertDialogHeader>
+              <AlertDialogTitle>Access denied</AlertDialogTitle>
+              <AlertDialogDescription>
+                You are not a part of this room. Join the room first with a
+                valid room ID before opening its files, chat, or editor.
+              </AlertDialogDescription>
+            </AlertDialogHeader>
+            <AlertDialogFooter>
+              <AlertDialogAction
+                onClick={() => navigate("/dashboard")}
+                className="bg-violet-600 hover:bg-violet-700"
+              >
+                Go to dashboard
+              </AlertDialogAction>
+            </AlertDialogFooter>
+          </AlertDialogContent>
+        </AlertDialog>
+      </div>
+    );
+  }
 
   return (
     <RoomProvider id={roomId} initialPresence={{ cursor: null }}>
