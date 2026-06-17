@@ -2,6 +2,14 @@
 
 A powerful, real-time collaborative code editor built for teams. Write, compile, and chat in sync with a modern, high-performance interface.
 
+## Screenshots
+
+### Dashboard
+![CodeFlow Dashboard](assets/dashboard.png)
+
+### Collaborative Workspace
+![CodeFlow Workspace](assets/editor.png)
+
 ## Features
 
 - **Real-time Collaboration**: Powered by **Yjs** and **Liveblocks**, experience sub-100ms synchronization across multiple users.
