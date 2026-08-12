@@ -25,42 +25,82 @@ router.post("/run", async (req, res) => {
   const { code, language, input } = req.body;
 
   const languageId = LANGUAGE_MAP[language];
+
   if (!languageId) {
-    return res.status(400).json({ error: "Unsupported language" });
+    return res.status(400).json({
+      error: "Unsupported language",
+    });
   }
 
   try {
+    // Base64 encode source code and input
+    const encodedCode = Buffer.from(
+      code || "",
+      "utf8"
+    ).toString("base64");
+
+    const encodedInput = Buffer.from(
+      input || "",
+      "utf8"
+    ).toString("base64");
+
     const submission = await axios.post(
       `${JUDGE0_URL}/submissions`,
       {
-        source_code: code,
+        source_code: encodedCode,
         language_id: languageId,
-        stdin: input || "",
+        stdin: encodedInput,
       },
       {
         headers: {
           "X-RapidAPI-Key": JUDGE0_KEY,
           "X-RapidAPI-Host": "judge0-ce.p.rapidapi.com",
+          "Content-Type": "application/json",
         },
-        params: { wait: true },
+        params: {
+          wait: true,
+          base64_encoded: true,
+        },
       }
     );
 
     const result = submission.data;
 
+    // Decode Base64 response from Judge0
+    const decodeBase64 = (
+      value: string | null | undefined
+    ): string => {
+      if (!value) {
+        return "";
+      }
+
+      return Buffer.from(value, "base64").toString("utf8");
+    };
+
     res.json({
-      stdout: result.stdout,
-      stderr: result.stderr,
-      compile_output: result.compile_output,
-      status: result.status.description,
+      stdout: decodeBase64(result.stdout),
+      stderr: decodeBase64(result.stderr),
+      compile_output: decodeBase64(result.compile_output),
+      message: decodeBase64(result.message),
+      status: result.status?.description || "Unknown",
       time: result.time,
       memory: result.memory,
     });
+
   } catch (err: any) {
-    console.error("Executor Error:", err.response?.data || err.message);
+    console.error(
+      "Executor Error:",
+      err.response?.data || err.message
+    );
+
     res.status(500).json({
-      error: err.response?.data?.error || "Execution failed",
-      details: err.response?.data || err.message
+      error:
+        err.response?.data?.error ||
+        "Execution failed",
+
+      details:
+        err.response?.data ||
+        err.message,
     });
   }
 });
